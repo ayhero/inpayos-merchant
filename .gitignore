@@ -1,0 +1,94 @@
+# 依赖
+node_modules/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# 构建输出
+dist/
+dist-ssr/
+build/
+*.local
+
+# 环境变量
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# 缓存文件
+.cache/
+.parcel-cache/
+.nyc_output/
+.vscode-test/
+
+# 测试覆盖率报告
+coverage/
+*.lcov
+
+# TypeScript
+*.tsbuildinfo
+
+# Vite
+.vite/
+
+# ESLint 缓存
+.eslintcache
+
+# Prettier 缓存
+.prettiercache
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 临时文件
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# 包管理器锁文件（根据团队选择保留其中一个）
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# 运行时
+*.pid
+*.seed
+*.pid.lock
+
+# 可选的 npm 缓存目录
+.npm
+
+# 可选的 eslint 缓存
+.eslintcache
+
+# 可选的 REPL 历史
+.node_repl_history
+
+# Yarn 完整性文件
+.yarn-integrity
+
+# 静态文件分析
+bundle-analyzer-report.html
+
+# 本地开发证书
+*.pem
