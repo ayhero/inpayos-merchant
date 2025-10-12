@@ -118,6 +118,12 @@ export function PayoutRecords() {
     return `${symbol}${num.toLocaleString()} ${currency}`;
   };
 
+  // 模态窗专用的金额格式化函数，格式为"币种 金额"
+  const formatCurrencyForModal = (amount: string, currency: string) => {
+    const num = parseFloat(amount);
+    return `${currency} ${num.toLocaleString()}`;
+  };
+
   const formatDateTime = (dateString: string) => {
     return new Date(dateString).toLocaleString('zh-CN');
   };
@@ -272,7 +278,7 @@ export function PayoutRecords() {
                   <TableCell className="font-mono text-sm">{record.trxID}</TableCell>
                   <TableCell className="font-mono text-sm">{record.reqID}</TableCell>
                   <TableCell>
-                    {formatCurrency(record.amount, record.ccy)}
+                    {formatCurrencyForModal(record.amount, record.ccy)}
                   </TableCell>
                   <TableCell>{record.trxMethod || '-'}</TableCell>
                   <TableCell>{getStatusBadge(record.status)}</TableCell>
@@ -310,7 +316,7 @@ export function PayoutRecords() {
                               <div>
                                 <label className="font-medium">交易金额</label>
                                 <p className="text-sm text-muted-foreground">
-                                  {formatCurrency(selectedRecord.amount, selectedRecord.ccy)}
+                                  {formatCurrencyForModal(selectedRecord.amount, selectedRecord.ccy)}
                                 </p>
                               </div>
                               <div>
