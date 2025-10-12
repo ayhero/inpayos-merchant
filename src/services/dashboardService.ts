@@ -2,8 +2,8 @@ import { api } from './api';
 
 // Dashboard数据类型定义
 export interface DashboardTodayStats {
-  today_collection: string;
-  today_collection_rate: string;
+  today_payin: string;
+  today_payin_rate: string;
   today_payout: string;
   today_payout_rate: string;
   success_rate: string;

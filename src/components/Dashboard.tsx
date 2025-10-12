@@ -109,11 +109,11 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatCurrency(todayStats?.today_collection || '0')}
+              {formatCurrency(todayStats?.today_payin || '0')}
             </div>
             <p className="text-xs text-muted-foreground">
-              <span className={getRateColor(todayStats?.today_collection_rate || '0')}>
-                {formatRate(todayStats?.today_collection_rate || '0')}
+              <span className={getRateColor(todayStats?.today_payin_rate || '0')}>
+                {formatRate(todayStats?.today_payin_rate || '0')}
               </span> 较昨日
             </p>
           </CardContent>

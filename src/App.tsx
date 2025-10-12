@@ -20,7 +20,7 @@ import {
 
 import { AuthContainer } from './components/AuthContainer';
 import { Dashboard } from './components/Dashboard';
-import { CollectionRecords } from './components/Payin';
+import { PayinRecords } from './components/Payin';
 import { PayoutRecords } from './components/Payout';
 // import { RefundRecords } from './components/RefundRecords';
 // import { RechargeRecords } from './components/RechargeRecords';
@@ -78,10 +78,10 @@ export default function App() {
       component: Dashboard
     },
     {
-      id: 'collection',
+      id: 'payin',
       label: '代收',
       icon: ArrowDownLeft,
-      component: CollectionRecords
+      component: PayinRecords
     },
     {
       id: 'payout',
@@ -167,7 +167,7 @@ export default function App() {
                 </h4>
               )}
               <div className="space-y-1">
-                {menuItems.slice(1, 4).map((item) => (
+                {menuItems.slice(1, 3).map((item) => (
                   <div
                     key={item.id}
                     className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer transition-colors ${

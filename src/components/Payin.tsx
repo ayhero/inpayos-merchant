@@ -16,7 +16,7 @@ import {
   TodayStats 
 } from '../services/transactionService';
 
-export function CollectionRecords() {
+export function PayinRecords() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [methodFilter, setMethodFilter] = useState('all');
