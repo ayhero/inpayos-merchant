@@ -12,7 +12,7 @@ export interface DashboardTodayStats {
 
 export interface DashboardTransactionTrend {
   date: string;
-  collection: number;
+  payin: number;
   payout: number;
 }
 

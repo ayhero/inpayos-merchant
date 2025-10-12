@@ -14,7 +14,7 @@ import { DEFAULT_CONFIG, MerchantConfigState } from './config/merchantConstants'
 import { updateConfig, updateNestedConfig, saveConfiguration } from './config/configHelpers';
 import { BasicConfig } from './config/BasicConfig';
 import { ApiConfig } from './config/ApiConfig';
-import { CollectionConfig } from './config/CollectionConfig';
+import { PayinConfig } from './config/PayinConfig';
 import { PayoutConfig } from './config/PayoutConfig';
 import { NotificationConfig } from './config/NotificationConfig';
 import { SecurityConfig } from './config/SecurityConfig';
@@ -65,7 +65,7 @@ export function MerchantConfig() {
     setConfig(prev => updateNestedConfig(prev, section, key, value));
   };
 
-  const handleApplyPaymentMethod = (section: 'collection' | 'payout', method: string) => {
+  const handleApplyPaymentMethod = (section: 'payin' | 'payout', method: string) => {
     console.log(`申请开通 ${section} ${method}`);
     // 模拟申请开通流程
   };
@@ -253,7 +253,7 @@ export function MerchantConfig() {
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="basic">基本信息</TabsTrigger>
           <TabsTrigger value="api">API配置</TabsTrigger>
-          <TabsTrigger value="collection">代收配置</TabsTrigger>
+          <TabsTrigger value="payin">代收配置</TabsTrigger>
           <TabsTrigger value="payout">代付配置</TabsTrigger>
           <TabsTrigger value="notification">通知设置</TabsTrigger>
           <TabsTrigger value="security">安全配置</TabsTrigger>
@@ -278,8 +278,8 @@ export function MerchantConfig() {
         </TabsContent>
 
         {/* 代收配置 */}
-        <TabsContent value="collection" className="space-y-4">
-          <CollectionConfig 
+        <TabsContent value="payin" className="space-y-4">
+          <PayinConfig 
             config={config}
             onNestedUpdate={handleNestedUpdate}
             onApplyPaymentMethod={handleApplyPaymentMethod}

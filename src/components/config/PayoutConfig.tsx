@@ -9,7 +9,7 @@ import { MerchantConfigState, PAYMENT_METHOD_INFO } from './merchantConstants';
 interface PayoutConfigProps {
   config: MerchantConfigState;
   onNestedUpdate: (section: keyof MerchantConfigState, key: string, value: any) => void;
-  onApplyPaymentMethod: (section: 'collection' | 'payout', method: string) => void;
+  onApplyPaymentMethod: (section: 'payin' | 'payout', method: string) => void;
 }
 
 export function PayoutConfig({ config, onNestedUpdate, onApplyPaymentMethod }: PayoutConfigProps) {

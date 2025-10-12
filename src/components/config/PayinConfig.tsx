@@ -6,13 +6,13 @@ import { Label } from '../ui/label';
 import { ArrowDownLeft } from 'lucide-react';
 import { MerchantConfigState, PAYMENT_METHOD_INFO } from './merchantConstants';
 
-interface CollectionConfigProps {
+interface PayinConfigProps {
   config: MerchantConfigState;
   onNestedUpdate: (section: keyof MerchantConfigState, key: string, value: any) => void;
-  onApplyPaymentMethod: (section: 'collection' | 'payout', method: string) => void;
+  onApplyPaymentMethod: (section: 'payin' | 'payout', method: string) => void;
 }
 
-export function CollectionConfig({ config, onNestedUpdate, onApplyPaymentMethod }: CollectionConfigProps) {
+export function PayinConfig({ config, onNestedUpdate, onApplyPaymentMethod }: PayinConfigProps) {
   return (
     <Card>
       <CardHeader>
@@ -39,7 +39,7 @@ export function CollectionConfig({ config, onNestedUpdate, onApplyPaymentMethod 
                   />
                 </div>
               </div>
-              <p className="text-sm text-green-700 dark:text-green-300 mb-3">{PAYMENT_METHOD_INFO.collection.upi.description}</p>
+              <p className="text-sm text-green-700 dark:text-green-300 mb-3">{PAYMENT_METHOD_INFO.payin.upi.description}</p>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <Label className="text-sm text-green-800 dark:text-green-200">费率</Label>
@@ -75,7 +75,7 @@ export function CollectionConfig({ config, onNestedUpdate, onApplyPaymentMethod 
                   />
                 </div>
               </div>
-              <p className="text-sm text-green-700 dark:text-green-300 mb-3">{PAYMENT_METHOD_INFO.collection.bankCard.description}</p>
+              <p className="text-sm text-green-700 dark:text-green-300 mb-3">{PAYMENT_METHOD_INFO.payin.bankCard.description}</p>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <Label className="text-sm text-green-800 dark:text-green-200">费率</Label>
@@ -114,13 +114,13 @@ export function CollectionConfig({ config, onNestedUpdate, onApplyPaymentMethod 
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => onApplyPaymentMethod('collection', 'usdt')}
+                    onClick={() => onApplyPaymentMethod('payin', 'usdt')}
                   >
                     申请开通
                   </Button>
                 )}
               </div>
-              <p className="text-sm text-yellow-700 dark:text-yellow-300 mb-3">{PAYMENT_METHOD_INFO.collection.usdt.description}</p>
+              <p className="text-sm text-yellow-700 dark:text-yellow-300 mb-3">{PAYMENT_METHOD_INFO.payin.usdt.description}</p>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <Label className="text-sm text-yellow-800 dark:text-yellow-200">费率</Label>

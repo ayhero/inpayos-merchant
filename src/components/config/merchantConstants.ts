@@ -107,7 +107,7 @@ export const DEFAULT_CONFIG: MerchantConfigState = {
 };
 
 export const PAYMENT_METHOD_INFO = {
-  collection: {
+  payin: {
     upi: {
       name: 'UPI (统一支付接口)',
       description: '印度主流支付方式'

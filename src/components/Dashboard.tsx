@@ -167,7 +167,7 @@ export function Dashboard() {
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="collection" fill="hsl(var(--chart-1))" name="代收" />
+              <Bar dataKey="payin" fill="hsl(var(--chart-1))" name="代收" />
               <Bar dataKey="payout" fill="hsl(var(--chart-2))" name="代付" />
             </BarChart>
           </ResponsiveContainer>
