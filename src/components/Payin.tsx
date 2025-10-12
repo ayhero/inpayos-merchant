@@ -290,7 +290,7 @@ export function CollectionRecords() {
                             详情
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-4xl">
+                        <DialogContent className="max-w-[45vw] w-[45vw] min-w-[600px]" style={{width: '45vw', maxWidth: '45vw'}}>
                           <DialogHeader>
                             <DialogTitle>代收交易详情</DialogTitle>
                             <DialogDescription>
@@ -298,7 +298,7 @@ export function CollectionRecords() {
                             </DialogDescription>
                           </DialogHeader>
                           {selectedRecord && (
-                            <div className="grid grid-cols-2 gap-4 py-4 max-h-96 overflow-y-auto">
+                            <div className="grid grid-cols-2 gap-4 py-4 max-h-[500px] overflow-y-auto">
                               <div>
                                 <label className="font-medium">交易ID</label>
                                 <p className="text-sm text-muted-foreground font-mono">{selectedRecord.trxID}</p>
@@ -314,12 +314,6 @@ export function CollectionRecords() {
                                 </p>
                               </div>
                               <div>
-                                <label className="font-medium">USD金额</label>
-                                <p className="text-sm text-muted-foreground">
-                                  ${parseFloat(selectedRecord.usdAmount).toLocaleString()}
-                                </p>
-                              </div>
-                              <div>
                                 <label className="font-medium">支付方式</label>
                                 <p className="text-sm text-muted-foreground">{selectedRecord.trxMethod || '-'}</p>
                               </div>
@@ -330,10 +324,6 @@ export function CollectionRecords() {
                               <div>
                                 <label className="font-medium">交易状态</label>
                                 <p className="text-sm text-muted-foreground">{getStatusBadge(selectedRecord.status)}</p>
-                              </div>
-                              <div>
-                                <label className="font-medium">渠道状态</label>
-                                <p className="text-sm text-muted-foreground">{selectedRecord.channelStatus}</p>
                               </div>
                               <div>
                                 <label className="font-medium">响应码</label>
@@ -356,14 +346,6 @@ export function CollectionRecords() {
                                     </a>
                                   ) : '-'}
                                 </p>
-                              </div>
-                              <div>
-                                <label className="font-medium">渠道代码</label>
-                                <p className="text-sm text-muted-foreground">{selectedRecord.channelCode || '-'}</p>
-                              </div>
-                              <div>
-                                <label className="font-medium">渠道账户</label>
-                                <p className="text-sm text-muted-foreground">{selectedRecord.channelAccount || '-'}</p>
                               </div>
                               <div>
                                 <label className="font-medium">渠道交易ID</label>

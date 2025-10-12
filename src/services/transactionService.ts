@@ -338,42 +338,49 @@ export const transactionService = {
     }
   },
 
-  // 获取今日统计 - 暂时保留模拟数据，后续可根据需要实现专门的统计接口
+  // 获取今日统计
   getTodayStats: async (trxType: TransactionType): Promise<ApiResponse<TodayStats>> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const stats: Record<TransactionType, TodayStats> = {
-          [TransactionType.PAYIN]: {
-            totalAmount: '1854500',
-            totalCount: 156,
-            successCount: 148,
-            successRate: 94.8,
-            pendingCount: 1
-          },
-          [TransactionType.PAYOUT]: {
-            totalAmount: '956800',
-            totalCount: 89,
-            successCount: 84,
-            successRate: 94.4,
-            pendingCount: 2
-          },
-          [TransactionType.REFUND]: {
-            totalAmount: '125600',
-            totalCount: 23,
-            successCount: 22,
-            successRate: 95.7,
-            pendingCount: 1
-          }
-        };
+    try {
+      const response = await api.post<TodayStats>('/transactions/today-stats', {
+        trx_type: trxType,
+      });
 
-        resolve({
+      if (response.code === '0000') {
+        return {
           code: '200',
-          msg: '获取成功',
+          msg: response.msg || '获取成功',
           success: true,
-          data: stats[trxType]
-        });
-      }, 300);
-    });
+          data: response.data,
+        };
+      } else {
+        return {
+          code: response.code,
+          msg: response.msg || '获取失败',
+          success: false,
+          data: {
+            totalAmount: '0',
+            totalCount: 0,
+            successCount: 0,
+            successRate: 0,
+            pendingCount: 0
+          },
+        };
+      }
+    } catch (error: any) {
+      console.error('获取今日统计失败:', error);
+      return {
+        code: '500',
+        msg: error.message || '网络错误',
+        success: false,
+        data: {
+          totalAmount: '0',
+          totalCount: 0,
+          successCount: 0,
+          successRate: 0,
+          pendingCount: 0
+        },
+      };
+    }
   },
 
   // 重试通知 - 如果后端有对应接口，可以修改为真实调用
