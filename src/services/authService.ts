@@ -85,7 +85,7 @@ export const authService = {
       }
 
       // 调用后端登录API
-      const response = await api.post<BackendLoginResponse>('/merchant/auth', requestData);
+      const response = await api.post<BackendLoginResponse>('/auth', requestData);
       
       // 检查响应是否成功
       if (response.code === "0000") {
@@ -160,7 +160,7 @@ export const authService = {
   register: async (userData: RegisterRequest): Promise<ApiResponse<LoginResponse>> => {
     try {
       // 调用后端注册接口
-      const response = await api.post<null>('/merchant/register', {
+      const response = await api.post<null>('/register', {
         email: userData.email,
         password: userData.password,
         nickname: userData.username,
@@ -254,7 +254,7 @@ export const authService = {
   // 修改密码
   changePassword: async (newPassword: string): Promise<ApiResponse<null>> => {
     try {
-      const response = await api.post<null>('/merchant/password/change', {
+      const response = await api.post<null>('/password/change', {
         new_password: newPassword
       });
       
@@ -289,7 +289,7 @@ export const authService = {
   // 发送邮箱验证码
   sendEmailVerificationCode: async (email: string, type: string = 'register'): Promise<ApiResponse<null>> => {
     try {
-      const response = await api.post<null>('/merchant/verifycode/send', {
+      const response = await api.post<null>('/verifycode/send', {
         email: email,
         type: type
       });
@@ -320,7 +320,7 @@ export const authService = {
   // 重置密码
   resetPassword: async (email: string, verificationCode: string): Promise<ApiResponse<null>> => {
     try {
-      const response = await api.post<null>('/merchant/password/reset', {
+      const response = await api.post<null>('/password/reset', {
         email: email,
         verification_code: verificationCode
       });

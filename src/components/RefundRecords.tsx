@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -8,13 +8,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Search, Filter, Download, RefreshCw } from 'lucide-react';
 import { 
-  unifiedTransactionService, 
+  transactionService, 
   TransactionInfo, 
   TransactionType, 
   TransactionStatus,
   TransactionQueryParams,
   TodayStats 
-} from '../services/unifiedTransactionService';
+} from '../services/transactionService';
 
 export function RefundRecords() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -35,7 +35,7 @@ export function RefundRecords() {
   // 获取今日统计
   const fetchTodayStats = async () => {
     try {
-      const response = await unifiedTransactionService.getTodayStats(TransactionType.REFUND);
+      const response = await transactionService.getTodayStats(TransactionType.REFUND);
       if (response.success) {
         setTodayStats(response.data);
       }
@@ -56,7 +56,7 @@ export function RefundRecords() {
 
       // 添加筛选条件
       if (statusFilter !== 'all') {
-        params.status = parseInt(statusFilter) as TransactionStatus;
+        params.status = statusFilter as TransactionStatus;
       }
       if (methodFilter !== 'all') {
         params.trxMethod = methodFilter;
@@ -68,7 +68,7 @@ export function RefundRecords() {
         params.trxID = searchTerm;
       }
 
-      const response = await unifiedTransactionService.getTransactions(params);
+      const response = await transactionService.getTransactions(params);
       if (response.success) {
         setRecords(response.data.items);
         setPagination(prev => ({
@@ -124,7 +124,7 @@ export function RefundRecords() {
 
   const handleRetryNotification = async (trxID: string) => {
     try {
-      await unifiedTransactionService.retryNotification(trxID);
+      await transactionService.retryNotification(trxID);
       // 可以添加成功提示
       fetchRecords(); // 刷新列表
     } catch (error) {
@@ -206,10 +206,10 @@ export function RefundRecords() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">所有状态</SelectItem>
-                <SelectItem value="1">成功</SelectItem>
-                <SelectItem value="0">处理中</SelectItem>
-                <SelectItem value="2">失败</SelectItem>
-                <SelectItem value="3">已取消</SelectItem>
+                <SelectItem value="success">成功</SelectItem>
+                <SelectItem value="pending">处理中</SelectItem>
+                <SelectItem value="failed">失败</SelectItem>
+                <SelectItem value="cancelled">已取消</SelectItem>
               </SelectContent>
             </Select>
             <Select value={methodFilter} onValueChange={setMethodFilter}>

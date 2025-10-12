@@ -11,7 +11,7 @@ export class G2FAService {
   // 获取G2FA密钥和二维码
   static async getG2FAKey(): Promise<ApiResponse<G2FAKeyResponse>> {
     try {
-      const response = await api.post<G2FAKeyResponse>('/merchant/g2fa/new', {});
+      const response = await api.post<G2FAKeyResponse>('/g2fa/new', {});
       return response;
     } catch (error) {
       console.error('获取G2FA密钥失败:', error);
@@ -26,7 +26,7 @@ export class G2FAService {
       if (emailCode) {
         requestData.verify_code = emailCode; // 使用后端期望的参数名 verify_code
       }
-      const response = await api.post('/merchant/g2fa/bind', requestData);
+      const response = await api.post('/g2fa/bind', requestData);
       return response;
     } catch (error) {
       console.error('G2FA绑定失败:', error);

@@ -15,15 +15,14 @@ import {
   LogOut,
   Building2,
   PanelLeftIcon,
-  KeyRound,
-  Undo2
+  KeyRound
 } from 'lucide-react';
 
 import { AuthContainer } from './components/AuthContainer';
 import { Dashboard } from './components/Dashboard';
 import { CollectionRecords } from './components/CollectionRecords';
 import { PayoutRecords } from './components/PayoutRecords';
-import { RefundRecords } from './components/RefundRecords';
+// import { RefundRecords } from './components/RefundRecords';
 // import { RechargeRecords } from './components/RechargeRecords';
 import { SettlementRecords } from './components/SettlementRecords';
 import { MerchantConfig } from './components/MerchantConfig';
@@ -90,12 +89,12 @@ export default function App() {
       icon: ArrowUpRight,
       component: PayoutRecords
     },
-    {
-      id: 'refund',
-      label: '退款',
-      icon: Undo2,
-      component: RefundRecords
-    },
+    // {
+    //   id: 'refund',
+    //   label: '退款',
+    //   icon: Undo2,
+    //   component: RefundRecords
+    // },
     // {
     //   id: 'recharge',
     //   label: '充值记录',
@@ -168,7 +167,7 @@ export default function App() {
                 </h4>
               )}
               <div className="space-y-1">
-                {menuItems.slice(1, 5).map((item) => (
+                {menuItems.slice(1, 4).map((item) => (
                   <div
                     key={item.id}
                     className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer transition-colors ${
@@ -193,7 +192,7 @@ export default function App() {
                 </h4>
               )}
               <div className="space-y-1">
-                {menuItems.slice(5, 7).map((item) => (
+                {menuItems.slice(4, 6).map((item) => (
                   <div
                     key={item.id}
                     className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer transition-colors ${

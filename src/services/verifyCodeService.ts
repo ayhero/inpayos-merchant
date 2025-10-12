@@ -14,7 +14,7 @@ export class VerifyCodeService {
   // 发送验证码
   static async sendVerifyCode(type: VerifyCodeType, email: string): Promise<ApiResponse<any>> {
     try {
-      const response = await api.post('/merchant/verifycode/send', { type, email });
+      const response = await api.post('/verifycode/send', { type, email });
       return response;
     } catch (error) {
       console.error('发送验证码失败:', error);

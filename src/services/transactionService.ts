@@ -1,47 +1,155 @@
-import { api, ApiResponse } from './api';
+import { ApiResponse, api } from './api';
 
-// 交易状态枚举
+// 交易类型枚举 - 与后端 protocol 保持一致
+export enum TransactionType {
+  PAYIN = 'payin',
+  PAYOUT = 'payout', 
+  REFUND = 'refund'
+}
+
+// 交易状态枚举 - 与后端 const.go 保持一致
 export enum TransactionStatus {
   PENDING = 'pending',
-  SUCCESS = 'success',
+  SUCCESS = 'success', 
   FAILED = 'failed',
   CANCELLED = 'cancelled'
 }
 
-// 交易类型枚举
-export enum TransactionType {
-  COLLECTION = 'collection',
-  PAYOUT = 'payout',
-  RECHARGE = 'recharge'
+// 渠道状态枚举
+export enum ChannelStatus {
+  PENDING = 0,
+  SUCCESS = 1,
+  FAILED = 2
 }
 
-// 交易记录接口
-export interface Transaction {
-  id: string;
-  type: TransactionType;
-  uid: string;
-  amount: number;
-  currency: string;
-  method: string;
+// 结算状态枚举
+export enum SettleStatus {
+  PENDING = 0,
+  SETTLED = 1,
+  FAILED = 2
+}
+
+// 后端返回的分页数据结构
+interface BackendPageResult<T> {
+  records: T[];
+  total: number;
+  current: number;
+  size: number;
+  count: number;
+}
+
+// 后端返回的交易信息（使用下划线命名格式）
+interface BackendTransactionInfo {
+  id: number;
+  trx_id: string;
+  req_id: string;
+  ori_trx_id?: string;
+  ori_req_id?: string;
+  status: string; // 使用字符串状态："success", "pending", "failed", "cancelled"
+  channel_status?: string;
+  res_code?: string;
+  res_msg?: string;
+  reason?: string;
+  ccy: string;
+  amount: string;
+  actual_amount?: string;
+  usd_amount?: string;
+  link?: string;
+  created_at: number; // 毫秒时间戳
+  updated_at: number; // 毫秒时间戳
+  completed_at?: number; // 毫秒时间戳
+  expired_at?: number; // 毫秒时间戳
+  trx_type: string;
+  trx_method?: string;
+  trx_mode?: string;
+  trx_app?: string;
+  channel_code?: string;
+  channel_account?: string;
+  channel_group?: string;
+  channel_trx_id?: string;
+  fee_ccy?: string;
+  fee_amount?: string;
+  fee_usd_amount?: string;
+  channel_fee_ccy?: string;
+  channel_fee_amount?: string;
+  flow_no?: string;
+  country?: string;
+  remark?: string;
+  settle_status?: string;
+  settle_id?: string;
+  settled_at?: number; // 毫秒时间戳
+  refunded_count?: number;
+  refunded_amount?: string;
+  refunded_usd_amount?: string;
+  last_refunded_at?: number; // 毫秒时间戳
+  detail?: any;
+  mid?: string;
+  product_id?: string;
+  version?: number;
+}
+
+// 统一交易信息接口 - 与后端 protocol.TransactionInfo 保持一致
+export interface TransactionInfo {
+  trxID: string;
+  reqID: string;
+  oriTrxID?: string;
+  oriReqID?: string;
   status: TransactionStatus;
+  channelStatus?: ChannelStatus;
+  resCode?: string;
+  resMsg?: string;
+  reason?: string;
+  ccy: string;
+  amount: string;
+  usdAmount: string;
+  link?: string;
   createdAt: string;
   updatedAt: string;
-  description?: string;
-  fee?: number;
-  merchantId: string;
+  completedAt?: string;
+  expiredAt?: string;
+  trxType: TransactionType;
+  trxMethod?: string;
+  trxMode?: string;
+  trxApp?: string;
+  channelCode?: string;
+  channelAccount?: string;
+  channelGroup?: string;
+  channelTrxID?: string;
+  feeCcy?: string;
+  feeAmount?: string;
+  feeUsdAmount?: string;
+  channelFeeCcy?: string;
+  channelFeeAmount?: string;
+  flowNo?: string;
+  country?: string;
+  remark?: string;
+  settleStatus?: SettleStatus;
+  settleID?: string;
+  settledAt?: string;
+  refundedCount?: number;
+  refundedAmount?: string;
+  refundedUsdAmount?: string;
+  lastRefundedAt?: string;
+  detail?: string;
 }
 
-// 分页参数
-export interface PaginationParams {
+// 查询参数接口
+export interface TransactionQueryParams {
+  trxType: TransactionType;
   page: number;
   pageSize: number;
   startDate?: string;
   endDate?: string;
   status?: TransactionStatus;
-  method?: string;
+  trxMethod?: string;
+  ccy?: string;
+  trxID?: string;
+  reqID?: string;
+  uid?: string;
+  channelCode?: string;
 }
 
-// 分页响应
+// 分页响应接口
 export interface PaginatedResponse<T> {
   items: T[];
   total: number;
@@ -50,181 +158,305 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
-// 仪表板统计数据
-export interface DashboardStats {
-  todayCollection: number;
-  todayPayout: number;
+// 今日统计数据接口
+export interface TodayStats {
+  totalAmount: string;
+  totalCount: number;
+  successCount: number;
   successRate: number;
-  weeklySettlement: number;
-  accountBalance: number;
-  weeklyTrend: {
-    name: string;
-    collection: number;
-    payout: number;
-    recharge: number;
-  }[];
-  paymentMethodStats: {
-    name: string;
-    value: number;
-    amount: number;
-    color: string;
-  }[];
-  recentTransactions: Transaction[];
+  pendingCount: number;
 }
+
+// 时间戳转换为 ISO 字符串的辅助函数
+const timestampToISOString = (timestamp?: number): string | undefined => {
+  return timestamp ? new Date(timestamp).toISOString() : undefined; // 后端返回毫秒时间戳，直接使用
+};
+
+// 后端数据转换为前端格式
+const convertBackendToFrontend = (backend: BackendTransactionInfo): TransactionInfo => {
+  return {
+    trxID: backend.trx_id,
+    reqID: backend.req_id,
+    oriTrxID: backend.ori_trx_id,
+    oriReqID: backend.ori_req_id,
+    status: backend.status as TransactionStatus,
+    channelStatus: backend.channel_status ? parseInt(backend.channel_status) as ChannelStatus : undefined,
+    resCode: backend.res_code,
+    resMsg: backend.res_msg,
+    reason: backend.reason,
+    ccy: backend.ccy,
+    amount: backend.amount,
+    usdAmount: backend.usd_amount || backend.amount, // 如果没有usd_amount，使用amount
+    link: backend.link,
+    createdAt: timestampToISOString(backend.created_at) || '',
+    updatedAt: timestampToISOString(backend.updated_at) || '',
+    completedAt: timestampToISOString(backend.completed_at),
+    expiredAt: timestampToISOString(backend.expired_at),
+    trxType: backend.trx_type as TransactionType,
+    trxMethod: backend.trx_method,
+    trxMode: backend.trx_mode,
+    trxApp: backend.trx_app,
+    channelCode: backend.channel_code,
+    channelAccount: backend.channel_account,
+    channelGroup: backend.channel_group,
+    channelTrxID: backend.channel_trx_id,
+    feeCcy: backend.fee_ccy,
+    feeAmount: backend.fee_amount,
+    feeUsdAmount: backend.fee_usd_amount,
+    channelFeeCcy: backend.channel_fee_ccy,
+    channelFeeAmount: backend.channel_fee_amount,
+    flowNo: backend.flow_no,
+    country: backend.country,
+    remark: backend.remark,
+    settleStatus: backend.settle_status ? (backend.settle_status as unknown as SettleStatus) : undefined,
+    settleID: backend.settle_id,
+    settledAt: timestampToISOString(backend.settled_at),
+    refundedCount: backend.refunded_count,
+    refundedAmount: backend.refunded_amount,
+    refundedUsdAmount: backend.refunded_usd_amount,
+    lastRefundedAt: timestampToISOString(backend.last_refunded_at),
+    detail: backend.detail ? JSON.stringify(backend.detail) : undefined,
+  };
+};
 
 // 交易服务
 export const transactionService = {
-  // 获取仪表板数据
-  getDashboardStats: async (): Promise<ApiResponse<DashboardStats>> => {
-    // 模拟数据
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          code: '200',
-          success: true,
-          msg: '获取成功',
-          data: {
-            todayCollection: 185450,
-            todayPayout: 95680,
-            successRate: 94.8,
-            weeklySettlement: 2120.25,
-            accountBalance: 895680,
-            weeklyTrend: [
-              { name: '周一', collection: 85000, payout: 45000, recharge: 12000 },
-              { name: '周二', collection: 120000, payout: 68000, recharge: 18000 },
-              { name: '周三', collection: 95000, payout: 52000, recharge: 15000 },
-              { name: '周四', collection: 150000, payout: 89000, recharge: 22000 },
-              { name: '周五', collection: 180000, payout: 125000, recharge: 28000 },
-              { name: '周六', collection: 165000, payout: 98000, recharge: 25000 },
-              { name: '周日', collection: 140000, payout: 75000, recharge: 20000 }
-            ],
-            paymentMethodStats: [
-              { name: 'UPI', value: 45, amount: 2850000, color: '#0088FE' },
-              { name: '银行卡', value: 30, amount: 1900000, color: '#00C49F' },
-              { name: 'USDT', value: 15, amount: 950000, color: '#FFBB28' },
-              { name: '其他', value: 10, amount: 630000, color: '#FF8042' }
-            ],
-            recentTransactions: [
-              {
-                id: 'COL001',
-                type: TransactionType.COLLECTION,
-                uid: 'user_12345',
-                amount: 15000,
-                currency: 'INR',
-                method: 'UPI',
-                status: TransactionStatus.SUCCESS,
-                createdAt: '2025-01-27T10:30:00Z',
-                updatedAt: '2025-01-27T10:30:00Z',
-                merchantId: '12345'
-              },
-              {
-                id: 'PAY002',
-                type: TransactionType.PAYOUT,
-                uid: 'user_67890',
-                amount: 8500,
-                currency: 'INR',
-                method: '银行卡',
-                status: TransactionStatus.PENDING,
-                createdAt: '2025-01-27T10:25:00Z',
-                updatedAt: '2025-01-27T10:25:00Z',
-                merchantId: '12345'
-              }
-            ]
-          }
-        });
-      }, 500);
-    });
-  },
+  // 获取交易列表
+  getTransactions: async (params: TransactionQueryParams): Promise<ApiResponse<PaginatedResponse<TransactionInfo>>> => {
+    try {
+      // 构建查询参数 - 后端 API 期望下划线格式的参数
+      const queryParams: Record<string, any> = {
+        trx_type: params.trxType,
+        page: params.page,
+        size: params.pageSize,
+      };
 
-  // 获取代收记录
-  getCollectionRecords: async (params: PaginationParams): Promise<ApiResponse<PaginatedResponse<Transaction>>> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const mockData: Transaction[] = [];
-        for (let i = 1; i <= 20; i++) {
-          mockData.push({
-            id: `COL${i.toString().padStart(3, '0')}`,
-            type: TransactionType.COLLECTION,
-            uid: `user_${Math.random().toString(36).substr(2, 9)}`,
-            amount: Math.floor(Math.random() * 50000) + 1000,
-            currency: 'INR',
-            method: ['UPI', '银行卡', 'USDT'][Math.floor(Math.random() * 3)],
-            status: [TransactionStatus.SUCCESS, TransactionStatus.PENDING, TransactionStatus.FAILED][Math.floor(Math.random() * 3)],
-            createdAt: new Date(Date.now() - Math.random() * 86400000 * 7).toISOString(),
-            updatedAt: new Date().toISOString(),
-            merchantId: '12345'
-          });
-        }
+      // 添加可选筛选条件
+      if (params.status !== undefined) {
+        queryParams.status = params.status;
+      }
+      if (params.trxMethod) {
+        queryParams.trx_method = params.trxMethod;
+      }
+      if (params.ccy) {
+        queryParams.ccy = params.ccy;
+      }
+      if (params.trxID) {
+        queryParams.trx_id = params.trxID;
+      }
+      if (params.reqID) {
+        queryParams.req_id = params.reqID;
+      }
+      if (params.startDate) {
+        queryParams.created_at_start = Math.floor(new Date(params.startDate).getTime() / 1000);
+      }
+      if (params.endDate) {
+        queryParams.created_at_end = Math.floor(new Date(params.endDate).getTime() / 1000);
+      }
 
-        resolve({
+      // 调用后端 API - 通过代理转发
+      const response = await api.post<BackendPageResult<BackendTransactionInfo>>('/transactions/list', queryParams);
+
+      if (response.code === '0000') {
+        // 转换数据格式
+        const convertedItems = response.data.records.map(convertBackendToFrontend);
+        
+        return {
           code: '200',
+          msg: response.msg || '获取成功',
           success: true,
-          msg: '获取成功',
           data: {
-            items: mockData.slice((params.page - 1) * params.pageSize, params.page * params.pageSize),
-            total: mockData.length,
+            items: convertedItems,
+            total: response.data.total,
+            page: response.data.current,
+            pageSize: response.data.size,
+            totalPages: response.data.count,
+          },
+        };
+      } else {
+        return {
+          code: response.code,
+          msg: response.msg || '获取失败',
+          success: false,
+          data: {
+            items: [],
+            total: 0,
             page: params.page,
             pageSize: params.pageSize,
-            totalPages: Math.ceil(mockData.length / params.pageSize)
-          }
-        });
-      }, 800);
-    });
-  },
-
-  // 获取代付记录
-  getPayoutRecords: async (params: PaginationParams): Promise<ApiResponse<PaginatedResponse<Transaction>>> => {
-    // 类似代收记录的模拟实现
-    return transactionService.getCollectionRecords(params);
-  },
-
-  // 获取充值记录
-  getRechargeRecords: async (params: PaginationParams): Promise<ApiResponse<PaginatedResponse<Transaction>>> => {
-    // 类似代收记录的模拟实现
-    return transactionService.getCollectionRecords(params);
-  },
-
-  // 获取结算记录
-  getSettlementRecords: async (params: PaginationParams): Promise<ApiResponse<PaginatedResponse<any>>> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          code: '200',
-          success: true,
-          msg: '获取成功',
-          data: {
-            items: [
-              {
-                id: 'SET001',
-                amount: 2120.25,
-                currency: 'INR',
-                period: '2025-01-20 至 2025-01-26',
-                status: 'completed',
-                createdAt: '2025-01-27T00:00:00Z'
-              }
-            ],
-            total: 1,
-            page: params.page,
-            pageSize: params.pageSize,
-            totalPages: 1
-          }
-        });
-      }, 600);
-    });
-  },
-
-  // 创建交易
-  createTransaction: async (transactionData: Partial<Transaction>): Promise<ApiResponse<Transaction>> => {
-    return api.post('/transactions', transactionData);
+            totalPages: 0,
+          },
+        };
+      }
+    } catch (error: any) {
+      console.error('获取交易列表失败:', error);
+      return {
+        code: '500',
+        msg: error.message || '网络错误',
+        success: false,
+        data: {
+          items: [],
+          total: 0,
+          page: params.page,
+          pageSize: params.pageSize,
+          totalPages: 0,
+        },
+      };
+    }
   },
 
   // 获取交易详情
-  getTransactionDetail: async (id: string): Promise<ApiResponse<Transaction>> => {
-    return api.get(`/transactions/${id}`);
+  getTransactionDetail: async (trxID: string, trxType?: TransactionType): Promise<ApiResponse<TransactionInfo>> => {
+    try {
+      const response = await api.post<BackendTransactionInfo>('/transactions/detail', {
+        trx_id: trxID,
+        trx_type: trxType || TransactionType.PAYIN
+      });
+
+      if (response.code === '0000') {
+        return {
+          code: '200',
+          msg: response.msg || '获取成功',
+          success: true,
+          data: convertBackendToFrontend(response.data),
+        };
+      } else {
+        return {
+          code: response.code,
+          msg: response.msg || '获取失败',
+          success: false,
+          data: {} as TransactionInfo,
+        };
+      }
+    } catch (error: any) {
+      console.error('获取交易详情失败:', error);
+      return {
+        code: '500',
+        msg: error.message || '网络错误',
+        success: false,
+        data: {} as TransactionInfo,
+      };
+    }
   },
 
-  // 取消交易
-  cancelTransaction: async (id: string): Promise<ApiResponse<null>> => {
-    return api.post(`/transactions/${id}/cancel`);
+  // 获取今日统计 - 暂时保留模拟数据，后续可根据需要实现专门的统计接口
+  getTodayStats: async (trxType: TransactionType): Promise<ApiResponse<TodayStats>> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const stats: Record<TransactionType, TodayStats> = {
+          [TransactionType.PAYIN]: {
+            totalAmount: '1854500',
+            totalCount: 156,
+            successCount: 148,
+            successRate: 94.8,
+            pendingCount: 1
+          },
+          [TransactionType.PAYOUT]: {
+            totalAmount: '956800',
+            totalCount: 89,
+            successCount: 84,
+            successRate: 94.4,
+            pendingCount: 2
+          },
+          [TransactionType.REFUND]: {
+            totalAmount: '125600',
+            totalCount: 23,
+            successCount: 22,
+            successRate: 95.7,
+            pendingCount: 1
+          }
+        };
+
+        resolve({
+          code: '200',
+          msg: '获取成功',
+          success: true,
+          data: stats[trxType]
+        });
+      }, 300);
+    });
+  },
+
+  // 重试通知 - 如果后端有对应接口，可以修改为真实调用
+  retryNotification: async (trxID: string): Promise<ApiResponse<null>> => {
+    try {
+      // 这里假设后端有重试通知的接口，需要根据实际情况调整
+      // const response = await api.post('/transactions/retry-notification', { trx_id: trxID });
+      
+      // 暂时使用模拟响应
+      console.log('Retrying notification for transaction:', trxID);
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({
+            code: '200',
+            msg: '重试通知成功',
+            success: true,
+            data: null
+          });
+        }, 1000);
+      });
+    } catch (error: any) {
+      console.error('重试通知失败:', error);
+      return {
+        code: '500',
+        msg: error.message || '网络错误',
+        success: false,
+        data: null,
+      };
+    }
+  },
+
+  // 创建退款 - 如果后端有对应接口，可以修改为真实调用
+  createRefund: async (params: {
+    oriTrxID: string;
+    amount: string;
+    reason?: string;
+  }): Promise<ApiResponse<TransactionInfo>> => {
+    try {
+      // 这里假设后端有创建退款的接口，需要根据实际情况调整
+      // const response = await api.post('/transactions/refund', {
+      //   ori_trx_id: params.oriTrxID,
+      //   amount: params.amount,
+      //   reason: params.reason,
+      // });
+      
+      // 暂时使用模拟响应
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const refund: TransactionInfo = {
+            trxID: `REFUND${Date.now()}`,
+            reqID: `REQ${Date.now()}`,
+            oriTrxID: params.oriTrxID,
+            status: TransactionStatus.PENDING,
+            channelStatus: ChannelStatus.PENDING,
+            resCode: '9999',
+            resMsg: 'Pending',
+            reason: params.reason,
+            ccy: 'INR',
+            amount: params.amount,
+            usdAmount: (parseFloat(params.amount) * 0.012).toString(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            trxType: TransactionType.REFUND,
+            trxMethod: 'UPI',
+            country: 'IN'
+          };
+
+          resolve({
+            code: '200',
+            msg: '退款申请已提交',
+            success: true,
+            data: refund
+          });
+        }, 1000);
+      });
+    } catch (error: any) {
+      console.error('创建退款失败:', error);
+      return {
+        code: '500',
+        msg: error.message || '网络错误',
+        success: false,
+        data: {} as TransactionInfo,
+      };
+    }
   }
 };
