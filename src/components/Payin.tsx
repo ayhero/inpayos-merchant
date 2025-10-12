@@ -19,8 +19,6 @@ import {
 export function PayinRecords() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [methodFilter, setMethodFilter] = useState('all');
-  const [currencyFilter, setCurrencyFilter] = useState('all');
   const [selectedRecord, setSelectedRecord] = useState<TransactionInfo | null>(null);
   const [records, setRecords] = useState<TransactionInfo[]>([]);
   const [loading, setLoading] = useState(false);
@@ -58,12 +56,6 @@ export function PayinRecords() {
       if (statusFilter !== 'all') {
         params.status = statusFilter as TransactionStatus;
       }
-      if (methodFilter !== 'all') {
-        params.trxMethod = methodFilter;
-      }
-      if (currencyFilter !== 'all') {
-        params.ccy = currencyFilter;
-      }
       if (searchTerm) {
         params.trxID = searchTerm;
       }
@@ -76,9 +68,24 @@ export function PayinRecords() {
           total: response.data.total,
           totalPages: response.data.totalPages
         }));
+      } else {
+        // API调用失败时清空记录和分页信息
+        setRecords([]);
+        setPagination(prev => ({
+          ...prev,
+          total: 0,
+          totalPages: 0
+        }));
       }
     } catch (error) {
       console.error('获取代收记录失败:', error);
+      // 发生异常时也清空数据
+      setRecords([]);
+      setPagination(prev => ({
+        ...prev,
+        total: 0,
+        totalPages: 0
+      }));
     } finally {
       setLoading(false);
     }
@@ -90,7 +97,13 @@ export function PayinRecords() {
 
   useEffect(() => {
     fetchRecords();
-  }, [pagination.page, statusFilter, methodFilter, currencyFilter]);
+  }, [pagination.page]);
+
+  // 当筛选条件变化时，重置到第一页并重新查询
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, page: 1 }));
+    // 由于分页变化会触发上面的useEffect，所以不需要直接调用fetchRecords
+  }, [statusFilter]);
 
   const handleSearch = () => {
     setPagination(prev => ({ ...prev, page: 1 }));
@@ -193,7 +206,7 @@ export function PayinRecords() {
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
+            <div className="flex-1 md:flex-initial md:w-64">
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -215,29 +228,6 @@ export function PayinRecords() {
                 <SelectItem value="pending">处理中</SelectItem>
                 <SelectItem value="failed">失败</SelectItem>
                 <SelectItem value="cancelled">已取消</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={methodFilter} onValueChange={setMethodFilter}>
-              <SelectTrigger className="w-full md:w-32">
-                <SelectValue placeholder="支付方式" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">所有方式</SelectItem>
-                <SelectItem value="UPI">UPI</SelectItem>
-                <SelectItem value="BANK_CARD">银行卡</SelectItem>
-                <SelectItem value="USDT">USDT</SelectItem>
-                <SelectItem value="WALLET">钱包</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={currencyFilter} onValueChange={setCurrencyFilter}>
-              <SelectTrigger className="w-full md:w-32">
-                <SelectValue placeholder="币种" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">所有币种</SelectItem>
-                <SelectItem value="INR">INR</SelectItem>
-                <SelectItem value="USDT">USDT</SelectItem>
-                <SelectItem value="USD">USD</SelectItem>
               </SelectContent>
             </Select>
             <Button onClick={handleSearch} className="gap-2">

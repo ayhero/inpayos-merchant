@@ -13,14 +13,11 @@ export interface PaymentLimits {
 export interface MerchantConfigState {
   // 基本信息
   companyName: string;
-  businessLicense: string;
   contactName: string;
   contactPhone: string;
   contactEmail: string;
-  businessAddress: string;
   
   // API配置
-  apiUrl: string;
   apiKey: string;
   webhookUrl: string;
   
@@ -42,12 +39,6 @@ export interface MerchantConfigState {
   };
   payoutLimits: PaymentLimits;
   
-  // 通知配置
-  enableEmailNotification: boolean;
-  enableSmsNotification: boolean;
-  emailRecipients: string;
-  smsRecipients: string;
-  
   // 安全配置
   ipWhitelist: string[];
   enableTwoFactor: boolean;
@@ -57,14 +48,11 @@ export interface MerchantConfigState {
 export const DEFAULT_CONFIG: MerchantConfigState = {
   // 基本信息
   companyName: '示例商户有限公司',
-  businessLicense: '91110000123456789X',
   contactName: '张经理',
   contactPhone: '+91-9876543210',
   contactEmail: 'contact@example.com',
-  businessAddress: '印度孟买商业区示例街道123号',
   
   // API配置
-  apiUrl: 'https://api-india.example.com/v1',
   apiKey: 'sk_live_india_123456789abcdef',
   webhookUrl: 'https://merchant.example.com/webhook',
   
@@ -93,12 +81,6 @@ export const DEFAULT_CONFIG: MerchantConfigState = {
     maxAmount: 500000,
     dailyLimit: 5000000
   },
-  
-  // 通知配置
-  enableEmailNotification: true,
-  enableSmsNotification: false,
-  emailRecipients: 'admin@example.com',
-  smsRecipients: '+91-9876543210',
   
   // 安全配置
   ipWhitelist: ['103.224.182.242', '203.192.225.116'],

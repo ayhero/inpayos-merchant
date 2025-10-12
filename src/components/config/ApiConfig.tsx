@@ -19,7 +19,7 @@ export function ApiConfig({ config, onConfigUpdate, showApiKey, onToggleApiKey }
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Key className="h-5 w-5" />
-          API接口配置
+          API配置
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -30,21 +30,14 @@ export function ApiConfig({ config, onConfigUpdate, showApiKey, onToggleApiKey }
         </Alert>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="apiUrl">API接口地址</Label>
-            <Input
-              id="apiUrl"
-              value={config.apiUrl}
-              onChange={(e) => onConfigUpdate('apiUrl', e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="apiKey">API密钥</Label>
-            <div className="relative">
+            <div className="relative max-w-md">
               <Input
                 id="apiKey"
                 type={showApiKey ? "text" : "password"}
                 value={config.apiKey}
                 onChange={(e) => onConfigUpdate('apiKey', e.target.value)}
+                className="w-full"
               />
               <Button
                 type="button"
@@ -63,16 +56,15 @@ export function ApiConfig({ config, onConfigUpdate, showApiKey, onToggleApiKey }
           </div>
           <div className="space-y-2">
             <Label htmlFor="webhookUrl">Webhook回调地址</Label>
-            <Input
-              id="webhookUrl"
-              value={config.webhookUrl}
-              onChange={(e) => onConfigUpdate('webhookUrl', e.target.value)}
-            />
+            <div className="max-w-md">
+              <Input
+                id="webhookUrl"
+                value={config.webhookUrl}
+                onChange={(e) => onConfigUpdate('webhookUrl', e.target.value)}
+                className="w-full"
+              />
+            </div>
           </div>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline">测试连接</Button>
-          <Button variant="outline">重新生成密钥</Button>
         </div>
       </CardContent>
     </Card>

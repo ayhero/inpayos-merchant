@@ -258,8 +258,8 @@ export const transactionService = {
       const response = await api.post<BackendPageResult<BackendTransactionInfo>>('/transactions/list', queryParams);
 
       if (response.code === '0000') {
-        // 转换数据格式
-        const convertedItems = response.data.records.map(convertBackendToFrontend);
+        // 转换数据格式 - 处理records为null的情况
+        const convertedItems = (response.data.records || []).map(convertBackendToFrontend);
         
         return {
           code: '200',

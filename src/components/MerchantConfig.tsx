@@ -16,7 +16,6 @@ import { BasicConfig } from './config/BasicConfig';
 import { ApiConfig } from './config/ApiConfig';
 import { PayinConfig } from './config/PayinConfig';
 import { PayoutConfig } from './config/PayoutConfig';
-import { NotificationConfig } from './config/NotificationConfig';
 import { SecurityConfig } from './config/SecurityConfig';
 
 export function MerchantConfig() {
@@ -250,12 +249,11 @@ export function MerchantConfig() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="basic">基本信息</TabsTrigger>
           <TabsTrigger value="api">API配置</TabsTrigger>
           <TabsTrigger value="payin">代收配置</TabsTrigger>
           <TabsTrigger value="payout">代付配置</TabsTrigger>
-          <TabsTrigger value="notification">通知设置</TabsTrigger>
           <TabsTrigger value="security">安全配置</TabsTrigger>
         </TabsList>
 
@@ -292,14 +290,6 @@ export function MerchantConfig() {
             config={config}
             onNestedUpdate={handleNestedUpdate}
             onApplyPaymentMethod={handleApplyPaymentMethod}
-          />
-        </TabsContent>
-
-        {/* 通知设置 */}
-        <TabsContent value="notification" className="space-y-4">
-          <NotificationConfig 
-            config={config}
-            onConfigUpdate={handleConfigUpdate}
           />
         </TabsContent>
 
