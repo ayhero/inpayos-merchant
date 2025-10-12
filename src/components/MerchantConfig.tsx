@@ -47,6 +47,16 @@ export function MerchantConfig() {
     }
   };
 
+  const handleSaveIpWhitelist = async () => {
+    try {
+      // 只保存IP白名单配置，这里简化处理，实际可能需要调用专门的API
+      await saveConfiguration(config);
+      // 显示成功消息
+    } catch (error) {
+      // 显示错误消息
+    }
+  };
+
   const handleConfigUpdate = (key: keyof MerchantConfigState, value: any) => {
     setConfig(prev => updateConfig(prev, key, value));
   };
@@ -303,17 +313,20 @@ export function MerchantConfig() {
             isSendingCode={isSendingCode}
             onGetG2FAKey={handleGetG2FAKey}
             onStartRebind={handleStartRebind}
+            onSaveIpWhitelist={handleSaveIpWhitelist}
           />
         </TabsContent>
       </Tabs>
 
-      {/* 保存按钮 */}
-      <div className="flex justify-end">
-        <Button onClick={handleSave} className="gap-2">
-          <Save className="h-4 w-4" />
-          保存配置
-        </Button>
-      </div>
+      {/* 保存按钮 - 在安全配置页面不显示 */}
+      {activeTab !== 'security' && (
+        <div className="flex justify-end">
+          <Button onClick={handleSave} className="gap-2">
+            <Save className="h-4 w-4" />
+            保存配置
+          </Button>
+        </div>
+      )}
 
       {/* G2FA 配置对话框 */}
       <Dialog 

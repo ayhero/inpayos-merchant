@@ -14,14 +14,14 @@ import {
   Wallet, 
   LogOut,
   Building2,
-  PanelLeftIcon,
+  Menu,
   KeyRound
 } from 'lucide-react';
 
 import { AuthContainer } from './components/AuthContainer';
 import { Dashboard } from './components/Dashboard';
-import { CollectionRecords } from './components/CollectionRecords';
-import { PayoutRecords } from './components/PayoutRecords';
+import { CollectionRecords } from './components/Payin';
+import { PayoutRecords } from './components/Payout';
 // import { RefundRecords } from './components/RefundRecords';
 // import { RechargeRecords } from './components/RechargeRecords';
 import { SettlementRecords } from './components/SettlementRecords';
@@ -220,9 +220,9 @@ export default function App() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="h-8 w-8 p-0"
+                className="h-10 w-10 p-0"
               >
-                <PanelLeftIcon className="h-4 w-4" />
+                <Menu className="h-6 w-6" />
               </Button>
               
               <div className="flex-1" />

@@ -6,7 +6,7 @@ import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Search, Filter, Download, RefreshCw, Plus } from 'lucide-react';
+import { Search, Filter, Download, RefreshCw } from 'lucide-react';
 import { 
   transactionService, 
   TransactionInfo, 
@@ -25,7 +25,6 @@ export function PayoutRecords() {
   const [records, setRecords] = useState<TransactionInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [todayStats, setTodayStats] = useState<TodayStats | null>(null);
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [pagination, setPagination] = useState({
     page: 1,
     pageSize: 20,
@@ -101,9 +100,9 @@ export function PayoutRecords() {
   const getStatusBadge = (status: TransactionStatus) => {
     switch (status) {
       case TransactionStatus.SUCCESS:
-        return <Badge variant="default">成功</Badge>;
+        return <Badge variant="default" className="bg-green-500">成功</Badge>;
       case TransactionStatus.PENDING:
-        return <Badge variant="secondary">处理中</Badge>;
+        return <Badge variant="secondary" className="bg-yellow-500">处理中</Badge>;
       case TransactionStatus.FAILED:
         return <Badge variant="destructive">失败</Badge>;
       case TransactionStatus.CANCELLED:
@@ -123,11 +122,6 @@ export function PayoutRecords() {
     return new Date(dateString).toLocaleString('zh-CN');
   };
 
-  const handleCreatePayout = () => {
-    console.log('创建代付');
-    setShowCreateDialog(false);
-  };
-
   const handleRetryNotification = async (trxID: string) => {
     try {
       await transactionService.retryNotification(trxID);
@@ -141,10 +135,6 @@ export function PayoutRecords() {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1>代付</h1>
-        <Button onClick={() => setShowCreateDialog(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          创建代付
-        </Button>
       </div>
 
       {/* 今日统计 */}
@@ -456,29 +446,6 @@ export function PayoutRecords() {
           </div>
         </CardContent>
       </Card>
-
-      {/* 创建代付对话框 */}
-      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>创建代付</DialogTitle>
-            <DialogDescription>
-              创建新的代付订单
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <p className="text-sm text-muted-foreground">创建代付功能开发中...</p>
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
-              取消
-            </Button>
-            <Button onClick={handleCreatePayout}>
-              确认创建
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
