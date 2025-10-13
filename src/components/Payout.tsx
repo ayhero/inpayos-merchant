@@ -36,9 +36,26 @@ export function PayoutRecords() {
       const response = await transactionService.getTodayStats(TransactionType.PAYOUT);
       if (response.success) {
         setTodayStats(response.data);
+      } else {
+        // API调用成功但返回失败时，显示默认数据
+        setTodayStats({
+          totalAmount: '0.00',
+          totalCount: 0,
+          successCount: 0,
+          successRate: 0,
+          pendingCount: 0
+        });
       }
     } catch (error) {
       console.error('获取今日统计失败:', error);
+      // 网络错误时也显示默认数据
+      setTodayStats({
+        totalAmount: '0.00',
+        totalCount: 0,
+        successCount: 0,
+        successRate: 0,
+        pendingCount: 0
+      });
     }
   };
 
