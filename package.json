@@ -1,5 +1,5 @@
 {
-  "name": "inpayos-merchant",
+  "name": "inpayos-cashier-admin",
   "private": true,
   "version": "0.0.0",
   "type": "module",

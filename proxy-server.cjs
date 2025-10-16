@@ -42,9 +42,9 @@ router.all('/api/(.*)', async (ctx) => {
     const { method, header, query } = ctx.request;
     const body = ctx.request.body;
     
-    // /api/merchant/auth -> /merchant/auth -> http://localhost:6081/merchant/auth
+    // /api/auth -> /auth -> http://localhost:6084/auth
     const targetPath = '/' + ctx.params[0];
-    const targetUrl = `http://localhost:6081${targetPath}`;
+    const targetUrl = `http://localhost:6084${targetPath}`;
     
     console.log(`[PROXY] ${method} ${ctx.url} -> ${targetUrl}`);
     
@@ -81,9 +81,9 @@ app.use(router.routes());
 app.use(router.allowedMethods());
 
 // 启动服务器
-app.listen(3001, () => {
-  console.log(`🚀 API Proxy Server running on http://localhost:3001`);
-  console.log(`🎯 Forwarding /api/* to http://localhost:9002/*`);
+app.listen(3202, () => {
+  console.log(`🚀 API Proxy Server running on http://localhost:3202`);
+  console.log(`🎯 Forwarding /api/* to http://localhost:6084/*`);
 });
 
 process.on('SIGTERM', () => process.exit(0));

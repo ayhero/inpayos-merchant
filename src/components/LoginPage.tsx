@@ -42,7 +42,7 @@ export function LoginPage({ onLogin, onSwitchToRegister, onSwitchToResetPassword
       
       if (response.code === "0000" && response.success) {
         login(response.data.user, response.data.token, response.data.refreshToken);
-        toast.success('登录成功', '欢迎回到InPayOS商户后台');
+        toast.success('登录成功', '欢迎回到InPayOSCashier后台');
         onLogin(response.data.user, response.data.token, response.data.refreshToken);
       } else {
         setErrorMessage(response.msg);
@@ -72,7 +72,7 @@ export function LoginPage({ onLogin, onSwitchToRegister, onSwitchToResetPassword
       
       if (response.code === "0000" && response.success) {
         login(response.data.user, response.data.token, response.data.refreshToken);
-        toast.success('登录成功', '欢迎回到InPayOS商户后台');
+        toast.success('登录成功', '欢迎回到InPayOSCashier后台');
         onLogin(response.data.user, response.data.token, response.data.refreshToken);
       } else {
         setErrorMessage(response.msg);

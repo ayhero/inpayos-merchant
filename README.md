@@ -1,6 +1,6 @@
-# InPayOS 商户后台管理系统
+# InPayOS Cashier后台管理系统
 
-一个现代化的支付系统商户后台管理界面，基于 React + TypeScript + Vite 构建。
+一个现代化的支付系统Cashier后台管理界面，基于 React + TypeScript + Vite 构建。
 
 ## 功能特性
 
@@ -21,6 +21,28 @@
 - **HTTP 客户端**: Axios
 - **图表库**: Recharts
 - **图标**: Lucide React
+
+## 端口配置
+
+| 服务 | 端口 | 描述 |
+|------|------|------|
+| 前端开发服务器 | 3201 | Vite开发服务器 |
+| API代理服务器 | 3202 | 转发前端API请求到后端 |
+| 后端CashierAdmin API | 6084 | 出纳员管理后台API服务 |
+
+### 启动服务
+
+```bash
+# 启动API代理服务器 (端口3202)
+npm run proxy
+
+# 启动前端开发服务器 (端口3201)  
+npm run dev
+```
+
+访问地址：
+- 前端界面: http://localhost:3201
+- API代理: http://localhost:3202
 
 ## 项目结构
 
@@ -63,7 +85,7 @@ npm install
 npm run dev
 ```
 
-访问 http://localhost:3000
+访问 http://localhost:3201
 
 ### 构建部署
 
@@ -89,8 +111,8 @@ npm run lint
 主要环境变量：
 
 ```bash
-VITE_APP_TITLE=InPayOS 商户后台
-VITE_API_BASE_URL=http://localhost:8080/api/v1
+VITE_APP_TITLE=InPayOS Cashier后台
+VITE_API_BASE_URL=http://localhost:3202
 VITE_APP_ENV=development
 VITE_ENABLE_DEBUG=true
 VITE_LOG_LEVEL=debug
