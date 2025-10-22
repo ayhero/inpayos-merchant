@@ -93,7 +93,7 @@ jobs:
           docker run -d \
             --name inpayos-merchant \
             --restart unless-stopped \
-            -p 8080:80 \
+            -p 3101:80 \
             -v /root/inpayos-merchant/logs:/var/log/nginx \
             ghcr.io/ayhero/inpayos-merchant:latest
           
@@ -110,11 +110,11 @@ jobs:
             
             # 检查端口监听
             echo "🔍 Checking port status:"
-            netstat -tlnp | grep ":8080" || echo "Port 8080 may still be binding..."
+            netstat -tlnp | grep ":3101" || echo "Port 3101 may still be binding..."
             
             # 尝试健康检查
             echo "🏥 Health check:"
-            if curl -f http://localhost:8080 2>/dev/null; then
+            if curl -f http://localhost:3101 2>/dev/null; then
               echo "✅ Merchant frontend health check passed"
             else
               echo "⚠️ Merchant frontend health check failed (may still be starting)"
