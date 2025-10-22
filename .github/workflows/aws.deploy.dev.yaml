@@ -79,67 +79,23 @@ jobs:
           mkdir -p /root/inpayos-merchant/logs
           cd /root/inpayos-merchant
           
-          # 创建nginx配置文件用于API代理
-          cat > nginx.conf << 'EOF'
-          server {
-              listen 80;
-              server_name _;
-              
-              # 前端静态文件
-              location / {
-                  proxy_pass http://app:3000;
-                  proxy_http_version 1.1;
-                  proxy_set_header Upgrade $http_upgrade;
-                  proxy_set_header Connection 'upgrade';
-                  proxy_set_header Host $host;
-                  proxy_set_header X-Real-IP $remote_addr;
-                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                  proxy_set_header X-Forwarded-Proto $scheme;
-                  proxy_cache_bypass $http_upgrade;
-              }
-              
-              # API代理转发到InPayOS Merchant API
-              location /api/ {
-                  proxy_pass http://43.204.234.146:6081/;
-                  proxy_http_version 1.1;
-                  proxy_set_header Host $host;
-                  proxy_set_header X-Real-IP $remote_addr;
-                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                  proxy_set_header X-Forwarded-Proto $scheme;
-              }
-          }
-          EOF
-          
           # 登录到 GitHub Container Registry
           echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           
           # 停止并删除现有容器
-          docker stop inpayos-merchant-app || true
-          docker rm inpayos-merchant-app || true
-          docker stop inpayos-merchant-nginx || true
-          docker rm inpayos-merchant-nginx || true
+          docker stop inpayos-merchant || true
+          docker rm inpayos-merchant || true
           
           # 拉取最新镜像
           docker pull ghcr.io/ayhero/inpayos-merchant:latest
           
-          # 启动前端应用容器
+          # 启动应用容器（nginx + 前端静态文件）
           docker run -d \
-            --name inpayos-merchant-app \
-            --restart unless-stopped \
-            -p 3000:3000 \
-            -e NODE_ENV=production \
-            -e VITE_API_URL=http://localhost/api \
-            -v /root/inpayos-merchant/logs:/app/logs \
-            ghcr.io/ayhero/inpayos-merchant:latest
-          
-          # 启动nginx代理容器
-          docker run -d \
-            --name inpayos-merchant-nginx \
+            --name inpayos-merchant \
             --restart unless-stopped \
             -p 8080:80 \
-            -v /root/inpayos-merchant/nginx.conf:/etc/nginx/conf.d/default.conf:ro \
-            --link inpayos-merchant-app:app \
-            nginx:alpine
+            -v /root/inpayos-merchant/logs:/var/log/nginx \
+            ghcr.io/ayhero/inpayos-merchant:latest
           
           # 等待服务启动
           sleep 15
@@ -149,7 +105,7 @@ jobs:
           docker ps -a | grep inpayos-merchant
           
           # 检查应用是否启动成功
-          if docker ps | grep inpayos-merchant-nginx | grep -q "Up"; then
+          if docker ps | grep inpayos-merchant | grep -q "Up"; then
             echo "✅ InPayOS Merchant frontend is running"
             
             # 检查端口监听
@@ -166,11 +122,9 @@ jobs:
             
             # 显示最近日志
             echo "📝 Recent logs:"
-            docker logs --tail=20 inpayos-merchant-app
-            docker logs --tail=10 inpayos-merchant-nginx
+            docker logs --tail=20 inpayos-merchant
           else
-            echo "❌ InPayOS Merchant containers failed to start"
-            docker logs inpayos-merchant-app
-            docker logs inpayos-merchant-nginx
+            echo "❌ InPayOS Merchant container failed to start"
+            docker logs inpayos-merchant
             exit 1
           fi
