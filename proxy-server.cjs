@@ -81,8 +81,8 @@ app.use(router.routes());
 app.use(router.allowedMethods());
 
 // 启动服务器
-app.listen(3202, () => {
-  console.log(`🚀 API Proxy Server running on http://localhost:3202`);
+app.listen(3102, () => {
+  console.log(`🚀 API Proxy Server running on http://localhost:3102`);
   console.log(`🎯 Forwarding /api/* to http://localhost:6081/*`);
 });
 
