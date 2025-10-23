@@ -98,6 +98,7 @@ jobs:
             --restart unless-stopped \
             -p 3101:80 \
             -v /root/inpayos-merchant/logs:/var/log/supervisor \
+            --add-host host.docker.internal:host-gateway \
             ghcr.io/ayhero/inpayos-merchant:latest
           
           # 等待服务启动
