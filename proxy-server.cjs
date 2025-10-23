@@ -83,7 +83,7 @@ app.use(router.allowedMethods());
 // 启动服务器
 app.listen(3102, () => {
   console.log(`🚀 API Proxy Server running on http://localhost:3102`);
-  console.log(`🎯 Forwarding /api/* to http://localhost:6081/*`);
+  console.log(`🎯 Forwarding /api/* to http://host.docker.internal:6081/*`);
 });
 
 process.on('SIGTERM', () => process.exit(0));
