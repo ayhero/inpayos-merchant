@@ -34,7 +34,7 @@ import { ToastContainer } from './components/Toast';
 
 export default function App() {
   const [activeMenu, setActiveMenu] = useState('dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
   const [merchantInfo, setMerchantInfo] = useState<UserInfo | null>(null);
   const { isLoggedIn, currentUser, login, logout } = useAuthStore();
