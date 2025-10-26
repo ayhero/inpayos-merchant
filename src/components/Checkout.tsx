@@ -793,42 +793,63 @@ export const Checkout: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle>完成支付</CardTitle>
-              <CardDescription>请按照以下信息完成转账并上传支付凭证</CardDescription>
+              <CardDescription>请选择支付应用完成转账</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* 收款信息 */}
+              {/* UPI 深度链接显示 */}
+              {selectedPaymentMethod === 'upi' && paymentAccountInfo?.transaction?.links && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex gap-2 flex-wrap">
+                    {paymentAccountInfo.transaction.links.paytm && (
+                      <Button 
+                        className="bg-blue-500 hover:bg-blue-600 text-white"
+                        onClick={() => window.open(paymentAccountInfo.transaction.links.paytm, '_blank')}
+                      >
+                        Paytm
+                      </Button>
+                    )}
+                    {paymentAccountInfo.transaction.links.phonepe && (
+                      <Button 
+                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                        onClick={() => window.open(paymentAccountInfo.transaction.links.phonepe, '_blank')}
+                      >
+                        PhonePe
+                      </Button>
+                    )}
+                    {paymentAccountInfo.transaction.links.googlepay && (
+                      <Button 
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => window.open(paymentAccountInfo.transaction.links.googlepay, '_blank')}
+                      >
+                        Google Pay
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 收款信息 - 隐藏 */}
+              {false && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <h3 className="font-medium mb-3 flex items-center gap-2">
                   <CreditCard className="h-4 w-4" />
                   收款账户信息
                 </h3>
                 <div className="space-y-3">
-                  {/* 调试信息显示 */}
-                  {paymentAccountInfo && (
-                    <div className="mb-3 p-2 bg-gray-50 border border-gray-200 rounded text-xs">
-                      <p className="text-gray-600 font-medium mb-1">调试信息:</p>
-                      <pre className="text-gray-500 whitespace-pre-wrap">
-                        {JSON.stringify(paymentAccountInfo, null, 2)}
-                      </pre>
-                    </div>
-                  )}
-                  
                   {selectedPaymentMethod === 'upi' ? (
                     <>
                       <div className="flex justify-between items-center py-2 px-3 bg-white rounded border">
                         <span className="font-medium">UPI ID:</span>
                         <div className="flex items-center gap-2">
                           <span className="font-mono">
-                            {paymentAccountInfo?.transaction?.account_no || 
-                             paymentAccountInfo?.account_no || 
-                             paymentAccountInfo?.upi_id || 
+                            {paymentAccountInfo?.transaction?.upi || 
+                             paymentAccountInfo?.transaction?.account_no || 
                              'merchant@paytm'}
                           </span>
                           <Button size="sm" variant="ghost" onClick={() => 
                             copyToClipboard(
+                              paymentAccountInfo?.transaction?.upi || 
                               paymentAccountInfo?.transaction?.account_no || 
-                              paymentAccountInfo?.account_no || 
-                              paymentAccountInfo?.upi_id || 
                               'merchant@paytm'
                             )
                           }>
@@ -839,11 +860,17 @@ export const Checkout: React.FC = () => {
                       <div className="flex justify-between items-center py-2 px-3 bg-white rounded border">
                         <span className="font-medium">收款人:</span>
                         <span>
-                          {paymentAccountInfo?.transaction?.account_name || 
-                           paymentAccountInfo?.account_name || 
+                          {paymentAccountInfo?.transaction?.holder_name || 
+                           paymentAccountInfo?.transaction?.account_name || 
                            'InPayOS Merchant'}
                         </span>
                       </div>
+                      {paymentAccountInfo?.transaction?.holder_phone && (
+                        <div className="flex justify-between items-center py-2 px-3 bg-white rounded border">
+                          <span className="font-medium">联系电话:</span>
+                          <span>{paymentAccountInfo.transaction.holder_phone}</span>
+                        </div>
+                      )}
                     </>
                   ) : selectedPaymentMethod === 'bank_transfer' ? (
                     <>
@@ -851,7 +878,6 @@ export const Checkout: React.FC = () => {
                         <span className="font-medium">银行名称:</span>
                         <span>
                           {paymentAccountInfo?.transaction?.bank_name || 
-                           paymentAccountInfo?.bank_name || 
                            'State Bank of India'}
                         </span>
                       </div>
@@ -860,13 +886,11 @@ export const Checkout: React.FC = () => {
                         <div className="flex items-center gap-2">
                           <span className="font-mono">
                             {paymentAccountInfo?.transaction?.account_no || 
-                             paymentAccountInfo?.account_no || 
                              '1234567890123456'}
                           </span>
                           <Button size="sm" variant="ghost" onClick={() => 
                             copyToClipboard(
                               paymentAccountInfo?.transaction?.account_no || 
-                              paymentAccountInfo?.account_no || 
                               '1234567890123456'
                             )
                           }>
@@ -877,30 +901,26 @@ export const Checkout: React.FC = () => {
                       <div className="flex justify-between items-center py-2 px-3 bg-white rounded border">
                         <span className="font-medium">账户名称:</span>
                         <span>
-                          {paymentAccountInfo?.transaction?.account_name || 
-                           paymentAccountInfo?.account_name || 
+                          {paymentAccountInfo?.transaction?.holder_name || 
+                           paymentAccountInfo?.transaction?.account_name || 
                            'InPayOS Merchant Account'}
                         </span>
                       </div>
-                      <div className="flex justify-between items-center py-2 px-3 bg-white rounded border">
-                        <span className="font-medium">IFSC代码:</span>
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono">
-                            {paymentAccountInfo?.transaction?.ifsc_code || 
-                             paymentAccountInfo?.ifsc_code || 
-                             'SBIN0001234'}
-                          </span>
-                          <Button size="sm" variant="ghost" onClick={() => 
-                            copyToClipboard(
-                              paymentAccountInfo?.transaction?.ifsc_code || 
-                              paymentAccountInfo?.ifsc_code || 
-                              'SBIN0001234'
-                            )
-                          }>
-                            <Copy className="h-3 w-3" />
-                          </Button>
+                      {paymentAccountInfo?.transaction?.bank_code && (
+                        <div className="flex justify-between items-center py-2 px-3 bg-white rounded border">
+                          <span className="font-medium">银行代码:</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono">
+                              {paymentAccountInfo.transaction.bank_code}
+                            </span>
+                            <Button size="sm" variant="ghost" onClick={() => 
+                              copyToClipboard(paymentAccountInfo.transaction.bank_code)
+                            }>
+                              <Copy className="h-3 w-3" />
+                            </Button>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </>
                   ) : (
                     <>
@@ -909,11 +929,11 @@ export const Checkout: React.FC = () => {
                         <span className="font-medium">收款账号:</span>
                         <div className="flex items-center gap-2">
                           <span className="font-mono">
-                            {paymentAccountInfo?.account_no || 'N/A'}
+                            {paymentAccountInfo?.transaction?.account_no || 'N/A'}
                           </span>
-                          {paymentAccountInfo?.account_no && (
+                          {paymentAccountInfo?.transaction?.account_no && (
                             <Button size="sm" variant="ghost" onClick={() => 
-                              copyToClipboard(paymentAccountInfo.account_no)
+                              copyToClipboard(paymentAccountInfo.transaction.account_no)
                             }>
                               <Copy className="h-3 w-3" />
                             </Button>
@@ -922,22 +942,32 @@ export const Checkout: React.FC = () => {
                       </div>
                       <div className="flex justify-between items-center py-2 px-3 bg-white rounded border">
                         <span className="font-medium">收款人:</span>
-                        <span>{paymentAccountInfo?.account_name || 'InPayOS Merchant'}</span>
+                        <span>
+                          {paymentAccountInfo?.transaction?.account_name || 
+                           paymentAccountInfo?.transaction?.holder_name || 
+                           'InPayOS Merchant'}
+                        </span>
                       </div>
                     </>
                   )}
                   <div className="flex justify-between items-center py-2 px-3 bg-white rounded border">
                     <span className="font-medium">转账金额:</span>
-                    <span className="font-semibold">{checkoutData?.amount} {checkoutData?.ccy}</span>
+                    <span className="font-semibold">
+                      {paymentAccountInfo?.transaction?.amount || checkoutData?.amount} {paymentAccountInfo?.transaction?.ccy || checkoutData?.ccy}
+                    </span>
                   </div>
                 </div>
               </div>
+              )}
 
               {/* 支付说明 */}
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <h4 className="font-medium text-green-800 mb-2">支付确认</h4>
                 <p className="text-sm text-green-700">
-                  请确认您已经完成向上述收款账户的转账操作。点击下方"确认支付完成"按钮来完成此次支付流程。
+                  {selectedPaymentMethod === 'upi' 
+                    ? '请点击上方支付应用按钮，或手动向上述 UPI ID 转账。转账完成后点击下方"确认支付完成"按钮。'
+                    : '请确认您已经完成向上述收款账户的转账操作。点击下方"确认支付完成"按钮来完成此次支付流程。'
+                  }
                 </p>
                 <div className="mt-3 p-2 bg-green-100 rounded text-xs text-green-600">
                   <p className="font-medium">注意事项：</p>
@@ -948,6 +978,18 @@ export const Checkout: React.FC = () => {
                   </ul>
                 </div>
               </div>
+
+              {/* 调试信息 */}
+              {paymentAccountInfo && (
+                <details className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <summary className="cursor-pointer font-medium text-sm text-gray-600">
+                    调试信息 (点击展开)
+                  </summary>
+                  <pre className="mt-2 text-xs text-gray-500 whitespace-pre-wrap overflow-auto max-h-96">
+                    {JSON.stringify(paymentAccountInfo, null, 2)}
+                  </pre>
+                </details>
+              )}
 
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setCurrentStep(2)}>
