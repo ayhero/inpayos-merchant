@@ -25,8 +25,9 @@ export function BasicConfig({ config, onConfigUpdate }: BasicConfigProps) {
             <Input
               id="companyName"
               value={config.companyName}
-              onChange={(e) => onConfigUpdate('companyName', e.target.value)}
-              className="w-80"
+              disabled
+              readOnly
+              className="w-80 bg-gray-50"
             />
           </div>
           <div className="space-y-1">
@@ -34,8 +35,9 @@ export function BasicConfig({ config, onConfigUpdate }: BasicConfigProps) {
             <Input
               id="contactName"
               value={config.contactName}
-              onChange={(e) => onConfigUpdate('contactName', e.target.value)}
-              className="w-80"
+              disabled
+              readOnly
+              className="w-80 bg-gray-50"
             />
           </div>
           <div className="space-y-1">
@@ -43,8 +45,9 @@ export function BasicConfig({ config, onConfigUpdate }: BasicConfigProps) {
             <Input
               id="contactPhone"
               value={config.contactPhone}
-              onChange={(e) => onConfigUpdate('contactPhone', e.target.value)}
-              className="w-80"
+              disabled
+              readOnly
+              className="w-80 bg-gray-50"
             />
           </div>
           <div className="space-y-1">
@@ -53,8 +56,9 @@ export function BasicConfig({ config, onConfigUpdate }: BasicConfigProps) {
               id="contactEmail"
               type="email"
               value={config.contactEmail}
-              onChange={(e) => onConfigUpdate('contactEmail', e.target.value)}
-              className="w-80"
+              disabled
+              readOnly
+              className="w-80 bg-gray-50"
             />
           </div>
         </div>

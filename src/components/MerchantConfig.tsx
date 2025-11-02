@@ -1,26 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
-import { Save, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { QRCodeDisplay } from './QRCodeDisplay';
 import { G2FAService, G2FAKeyResponse } from '../services/g2faService';
 import { UserService } from '../services/userService';
 import { VerifyCodeService } from '../services/verifyCodeService';
 import { toast } from '../utils/toast';
+import { api } from '../services/api';
 
 import { DEFAULT_CONFIG, MerchantConfigState } from './config/merchantConstants';
-import { updateConfig, updateNestedConfig, saveConfiguration } from './config/configHelpers';
+import { updateConfig } from './config/configHelpers';
 import { BasicConfig } from './config/BasicConfig';
 import { ApiConfig } from './config/ApiConfig';
-import { PayinConfig } from './config/PayinConfig';
-import { PayoutConfig } from './config/PayoutConfig';
 import { SecurityConfig } from './config/SecurityConfig';
 
 export function MerchantConfig() {
   const [config, setConfig] = useState<MerchantConfigState>(DEFAULT_CONFIG);
-  const [activeTab, setActiveTab] = useState('basic');
   const [showGoogleAuthDialog, setShowGoogleAuthDialog] = useState(false);
   const [googleAuthEnabled, setGoogleAuthEnabled] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
@@ -37,36 +34,56 @@ export function MerchantConfig() {
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [isRebinding, setIsRebinding] = useState(false);
 
-  const handleSave = async () => {
+  // 保存 Webhook URL
+  const handleSaveWebhook = async () => {
     try {
-      await saveConfiguration(config);
-      // 显示成功消息
+      setLoading(true);
+      const response = await api.post('/merchant-admin/save', {
+        notify_url: config.webhookUrl
+      });
+      
+      if (response.code === '0000') {
+        toast.success("保存成功", "Webhook URL已更新");
+      } else {
+        toast.error("保存失败", response.msg || "保存Webhook URL失败");
+      }
     } catch (error) {
-      // 显示错误消息
+      console.error('保存Webhook URL失败:', error);
+      toast.error("保存失败", "网络错误，请稍后重试");
+    } finally {
+      setLoading(false);
     }
   };
 
+  // 保存 IP 白名单
   const handleSaveIpWhitelist = async () => {
     try {
-      // 只保存IP白名单配置，这里简化处理，实际可能需要调用专门的API
-      await saveConfiguration(config);
-      // 显示成功消息
+      setLoading(true);
+      
+      // 将 IP 白名单数组转换为逗号分隔的字符串
+      const ipWhitelistStr = Array.isArray(config.ipWhitelist) 
+        ? config.ipWhitelist.join(',') 
+        : config.ipWhitelist;
+      
+      const response = await api.post('/merchant-admin/save', {
+        white_list_ip: ipWhitelistStr
+      });
+      
+      if (response.code === '0000') {
+        toast.success("保存成功", "IP白名单已更新");
+      } else {
+        toast.error("保存失败", response.msg || "保存IP白名单失败");
+      }
     } catch (error) {
-      // 显示错误消息
+      console.error('保存IP白名单失败:', error);
+      toast.error("保存失败", "网络错误，请稍后重试");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleConfigUpdate = (key: keyof MerchantConfigState, value: any) => {
     setConfig(prev => updateConfig(prev, key, value));
-  };
-
-  const handleNestedUpdate = (section: keyof MerchantConfigState, key: string, value: any) => {
-    setConfig(prev => updateNestedConfig(prev, section, key, value));
-  };
-
-  const handleApplyPaymentMethod = (section: 'payin' | 'payout', method: string) => {
-    console.log(`申请开通 ${section} ${method}`);
-    // 模拟申请开通流程
   };
 
   // 加载用户信息和 G2FA 状态
@@ -76,6 +93,14 @@ export function MerchantConfig() {
       if (response.code === '0000') {
         setGoogleAuthEnabled(response.data.has_g2fa);
         setUserEmail(response.data.email);
+        
+        // 设置商户信息（只读）
+        setConfig(prev => ({
+          ...prev,
+          companyName: response.data.name || prev.companyName,
+          contactEmail: response.data.email || prev.contactEmail,
+          contactPhone: response.data.phone || prev.contactPhone,
+        }));
       }
     } catch (error) {
       console.error('加载用户信息失败:', error);
@@ -248,75 +273,33 @@ export function MerchantConfig() {
         <h1>商户配置</h1>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="basic">基本信息</TabsTrigger>
-          <TabsTrigger value="api">API配置</TabsTrigger>
-          <TabsTrigger value="payin">代收配置</TabsTrigger>
-          <TabsTrigger value="payout">代付配置</TabsTrigger>
-          <TabsTrigger value="security">安全配置</TabsTrigger>
-        </TabsList>
+      {/* 基本信息 */}
+      <BasicConfig 
+        config={config}
+        onConfigUpdate={handleConfigUpdate}
+      />
 
-        {/* 基本信息 */}
-        <TabsContent value="basic" className="space-y-4">
-          <BasicConfig 
-            config={config}
-            onConfigUpdate={handleConfigUpdate}
-          />
-        </TabsContent>
+      {/* API配置 */}
+      <ApiConfig 
+        config={config}
+        onConfigUpdate={handleConfigUpdate}
+        showApiKey={showApiKey}
+        onToggleApiKey={() => setShowApiKey(!showApiKey)}
+        onSaveWebhook={handleSaveWebhook}
+        loading={loading}
+      />
 
-        {/* API配置 */}
-        <TabsContent value="api" className="space-y-4">
-          <ApiConfig 
-            config={config}
-            onConfigUpdate={handleConfigUpdate}
-            showApiKey={showApiKey}
-            onToggleApiKey={() => setShowApiKey(!showApiKey)}
-          />
-        </TabsContent>
-
-        {/* 代收配置 */}
-        <TabsContent value="payin" className="space-y-4">
-          <PayinConfig 
-            config={config}
-            onNestedUpdate={handleNestedUpdate}
-            onApplyPaymentMethod={handleApplyPaymentMethod}
-          />
-        </TabsContent>
-
-        {/* 代付配置 */}
-        <TabsContent value="payout" className="space-y-4">
-          <PayoutConfig 
-            config={config}
-            onNestedUpdate={handleNestedUpdate}
-            onApplyPaymentMethod={handleApplyPaymentMethod}
-          />
-        </TabsContent>
-
-        {/* 安全配置 */}
-        <TabsContent value="security" className="space-y-4">
-          <SecurityConfig 
-            config={config}
-            onConfigUpdate={handleConfigUpdate}
-            googleAuthEnabled={googleAuthEnabled}
-            loading={loading}
-            isSendingCode={isSendingCode}
-            onGetG2FAKey={handleGetG2FAKey}
-            onStartRebind={handleStartRebind}
-            onSaveIpWhitelist={handleSaveIpWhitelist}
-          />
-        </TabsContent>
-      </Tabs>
-
-      {/* 保存按钮 - 在安全配置页面不显示 */}
-      {activeTab !== 'security' && (
-        <div className="flex justify-end">
-          <Button onClick={handleSave} className="gap-2">
-            <Save className="h-4 w-4" />
-            保存配置
-          </Button>
-        </div>
-      )}
+      {/* 安全配置 */}
+      <SecurityConfig 
+        config={config}
+        onConfigUpdate={handleConfigUpdate}
+        googleAuthEnabled={googleAuthEnabled}
+        loading={loading}
+        isSendingCode={isSendingCode}
+        onGetG2FAKey={handleGetG2FAKey}
+        onStartRebind={handleStartRebind}
+        onSaveIpWhitelist={handleSaveIpWhitelist}
+      />
 
       {/* G2FA 配置对话框 */}
       <Dialog 

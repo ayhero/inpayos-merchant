@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export interface User {
   id: string;
+  mid?: string; // 商户ID
   username: string;
   email: string;
   companyName: string;

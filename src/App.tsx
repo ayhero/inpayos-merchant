@@ -16,7 +16,8 @@ import {
   Building2,
   Menu,
   KeyRound,
-  CreditCard
+  CreditCard,
+  FileText
 } from 'lucide-react';
 
 import { AuthContainer } from './components/AuthContainer';
@@ -28,6 +29,7 @@ import { PayoutRecords } from './components/Payout';
 import { SettlementRecords } from './components/SettlementRecords';
 import { MerchantConfig } from './components/MerchantConfig';
 import { AccountBalance } from './components/AccountBalance';
+import { MerchantContract } from './components/MerchantContract';
 import { ChangePasswordPage } from './components/ChangePasswordPage';
 import { Checkout } from './components/Checkout';
 import { ToastContainer } from './components/Toast';
@@ -59,11 +61,16 @@ export default function App() {
 
   // 获取商户信息
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isLoggedIn && !currentUser?.mid) {
       UserService.getUserInfo()
         .then(response => {
           if (response.code === '0000') {
             setMerchantInfo(response.data);
+            // 更新 currentUser 中的 mid
+            if (response.data.mid && currentUser) {
+              const updatedUser = { ...currentUser, mid: response.data.mid };
+              login(updatedUser, useAuthStore.getState().token || '', useAuthStore.getState().refreshToken || undefined);
+            }
           }
         })
         .catch(error => {
@@ -97,18 +104,6 @@ export default function App() {
       icon: ArrowUpRight,
       component: PayoutRecords
     },
-    // {
-    //   id: 'refund',
-    //   label: '退款',
-    //   icon: Undo2,
-    //   component: RefundRecords
-    // },
-    // {
-    //   id: 'recharge',
-    //   label: '充值记录',
-    //   icon: Plus,
-    //   component: RechargeRecords
-    // },
     {
       id: 'settlement',
       label: '结算',
@@ -120,6 +115,12 @@ export default function App() {
       label: '账户',
       icon: Wallet,
       component: AccountBalance
+    },
+    {
+      id: 'contract',
+      label: '合约',
+      icon: FileText,
+      component: MerchantContract
     },
     {
       id: 'config',
@@ -190,7 +191,7 @@ export default function App() {
                 </h4>
               )}
               <div className="space-y-1">
-                {menuItems.slice(2, 4).map((item) => (
+                {menuItems.slice(2, 5).map((item) => (
                   <div
                     key={item.id}
                     className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer transition-colors ${
@@ -215,7 +216,7 @@ export default function App() {
                 </h4>
               )}
               <div className="space-y-1">
-                {menuItems.slice(5, 7).map((item) => (
+                {menuItems.slice(5, 8).map((item) => (
                   <div
                     key={item.id}
                     className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer transition-colors ${
