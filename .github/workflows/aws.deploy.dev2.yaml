@@ -84,25 +84,25 @@ jobs:
         command_timeout: 10m
         script: |
           # 创建应用目录
-          mkdir -p /root/inpayos-merchant-dev2/logs
-          cd /root/inpayos-merchant-dev2
+          mkdir -p /root/inpayos-merchant/logs
+          cd /root/inpayos-merchant
           
           # 登录到 GitHub Container Registry
           echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           
           # 停止并删除现有容器
-          docker stop inpayos-merchant-dev2 || true
-          docker rm inpayos-merchant-dev2 || true
+          docker stop inpayos-merchant || true
+          docker rm inpayos-merchant || true
           
           # 拉取最新镜像
           docker pull ghcr.io/ayhero/inpayos-merchant:latest
           
           # 启动应用容器（nginx + Node.js 代理服务器）
           docker run -d \
-            --name inpayos-merchant-dev2 \
+            --name inpayos-merchant \
             --restart unless-stopped \
             -p 3101:80 \
-            -v /root/inpayos-merchant-dev2/logs:/var/log/supervisor \
+            -v /root/inpayos-merchant/logs:/var/log/supervisor \
             --add-host host.docker.internal:host-gateway \
             ghcr.io/ayhero/inpayos-merchant:latest
           
@@ -111,10 +111,10 @@ jobs:
           
           # 检查容器状态
           echo "🔍 Checking container status:"
-          docker ps -a | grep inpayos-merchant-dev2
+          docker ps -a | grep inpayos-merchant
           
           # 检查应用是否启动成功
-          if docker ps | grep inpayos-merchant-dev2 | grep -q "Up"; then
+          if docker ps | grep inpayos-merchant | grep -q "Up"; then
             echo "✅ InPayOS Merchant Dev2 frontend is running"
             
             # 检查端口监听
@@ -131,9 +131,9 @@ jobs:
             
             # 显示最近日志
             echo "📝 Recent logs:"
-            docker logs --tail=20 inpayos-merchant-dev2
+            docker logs --tail=20 inpayos-merchant
           else
             echo "❌ InPayOS Merchant Dev2 container failed to start"
-            docker logs inpayos-merchant-dev2
+            docker logs inpayos-merchant
             exit 1
           fi
