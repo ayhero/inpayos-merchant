@@ -75,15 +75,27 @@ sync-config-prod: ## 同步生产环境配置到GitHub Secrets
 	@cat .env.production | GH_TOKEN="" gh secret set ENV --env PROD
 	@echo "✅ 生产环境配置同步成功!"
 
-check-github-auth: ## 检查GitHub CLI认证状态
-	@echo "🔐 检查GitHub CLI认证状态..."
-	@echo "⚡ 注意: 如果你有GH_TOKEN环境变量，可能需要使用 GH_TOKEN=\"\" make sync-config-xxx"
+# 切换到 ayhero@gmail.com 的 GitHub 账户
+gh-switch-ayhero: ## 切换到 ayhero@gmail.com 的 GitHub 账户
+	@echo "🔄 切换到 GitHub 账户 ayhero@gmail.com..."
+	@gh auth switch --hostname github.com --user ayhero
+	@echo "✅ 已切换到 ayhero@gmail.com"
+	@gh auth status
+
+push: gh-switch-ayhero ## 推送代码到GitHub（自动切换到ayhero账号）
+	@echo "📤 推送代码到GitHub仓库..."
+	@git add .
+	@git status
 	@echo ""
-	@echo "📊 当前GitHub认证状态:"
-	@GH_TOKEN="" gh auth status 2>/dev/null || echo "❌ GitHub CLI未认证，请运行: gh auth login"
-	@echo ""
-	@if GH_TOKEN="" gh auth status 2>/dev/null | grep -A1 "ayhero" | grep -q "Active account: true"; then \
-		echo "✅ 当前正在使用ayhero账户，可以同步配置"; \
+	@if ! git diff --cached --quiet; then \
+		read -p "请输入提交信息 (按Enter使用默认): " commit_msg; \
+		if [ -z "$$commit_msg" ]; then \
+			commit_msg="Update: $$(date '+%Y-%m-%d %H:%M:%S')"; \
+		fi; \
+		echo "💾 提交信息: $$commit_msg"; \
+		git commit -m "$$commit_msg"; \
 	else \
-		echo "⚠️  当前未使用ayhero账户，请运行: GH_TOKEN=\"\" gh auth switch --hostname github.com --user ayhero"; \
+		echo "ℹ️  没有新的更改需要提交"; \
 	fi
+	@git push origin main
+	@echo "✅ 代码推送完成!"
