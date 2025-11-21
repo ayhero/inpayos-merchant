@@ -28,12 +28,8 @@ export function AccountDetail({ account, formatDateTime, formatAmount }: Account
     <div className="space-y-6 max-h-[500px] overflow-y-auto">
       {/* 基本信息 */}
       <div className="space-y-4">
-        {/* 第一行：账户ID、用户信息、空位（保持3列对齐） */}
+        {/* 第一行：用户信息 */}
         <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label className="text-sm font-medium text-gray-500">账户ID</label>
-            <p className="mt-1 text-sm font-mono">{account.account_id}</p>
-          </div>
           <div>
             <label className="text-sm font-medium text-gray-500">商户</label>
             <Tooltip>
@@ -54,6 +50,7 @@ export function AccountDetail({ account, formatDateTime, formatAmount }: Account
               )}
             </Tooltip>
           </div>
+          <div></div>
           <div></div>
         </div>
         

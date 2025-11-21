@@ -73,17 +73,10 @@ export function ContractDetail({ contract }: ContractDetailProps) {
           <p className="mt-1 font-mono text-sm">{contract.contract_id}</p>
         </div>
         <div>
-          <label className="text-sm font-medium text-gray-500">原合约ID</label>
-          <p className="mt-1 font-mono text-sm">{contract.ori_contract_id || '-'}</p>
-        </div>
-        <div>
-          <label className="text-sm font-medium text-gray-500">商户ID</label>
-          <p className="mt-1 font-mono text-sm">{contract.sid}</p>
-        </div>
-        <div>
           <label className="text-sm font-medium text-gray-500">状态</label>
           <p className="mt-1">{getStatusBadge(contract.status)}</p>
         </div>
+        <div></div>
         <div>
           <label className="text-sm font-medium text-gray-500">生效时间</label>
           <p className="mt-1 text-sm">{formatDateTime(contract.start_at)}</p>
@@ -92,6 +85,7 @@ export function ContractDetail({ contract }: ContractDetailProps) {
           <label className="text-sm font-medium text-gray-500">过期时间</label>
           <p className="mt-1 text-sm">{contract.expired_at ? formatDateTime(contract.expired_at) : '永久有效'}</p>
         </div>
+        <div></div>
         <div>
           <label className="text-sm font-medium text-gray-500">创建时间</label>
           <p className="mt-1 text-sm">{formatDateTime(contract.created_at)}</p>
@@ -100,6 +94,7 @@ export function ContractDetail({ contract }: ContractDetailProps) {
           <label className="text-sm font-medium text-gray-500">更新时间</label>
           <p className="mt-1 text-sm">{formatDateTime(contract.updated_at)}</p>
         </div>
+        <div></div>
       </div>
       
       {/* 代收配置 */}

@@ -16,6 +16,7 @@ import {
   TodayStats 
 } from '../services/transactionService';
 import { getStatusDisplayName, getStatusColor } from '../constants/status';
+import { PaymentMethodDisplay } from './common/PaymentMethodDisplay';
 
 export function PayoutRecords() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -294,7 +295,9 @@ export function PayoutRecords() {
                   <TableCell>
                     {formatCurrencyForModal(record.amount, record.ccy)}
                   </TableCell>
-                  <TableCell>{record.trxMethod || '-'}</TableCell>
+                  <TableCell>
+                    <PaymentMethodDisplay method={record.trxMethod} />
+                  </TableCell>
                   <TableCell>{getStatusBadge(record.status)}</TableCell>
                   <TableCell>{formatDateTime(record.createdAt)}</TableCell>
                   <TableCell>{record.completedAt ? formatDateTime(record.completedAt) : '-'}</TableCell>
@@ -332,7 +335,13 @@ export function PayoutRecords() {
                               </div>
                               <div>
                                 <label className="text-sm text-muted-foreground">支付方式</label>
-                                <p className="text-base font-semibold mt-1">{selectedRecord.trxMethod || '-'}</p>
+                                <div className="mt-1">
+                                  <PaymentMethodDisplay 
+                                    method={selectedRecord.trxMethod} 
+                                    mode="detailed" 
+                                    className="font-semibold"
+                                  />
+                                </div>
                               </div>
                               <div>
                                 <label className="text-sm text-muted-foreground">交易模式</label>

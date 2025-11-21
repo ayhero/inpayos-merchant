@@ -103,7 +103,6 @@ export function AccountBalance() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>账户ID</TableHead>
                   <TableHead>币种</TableHead>
                   <TableHead>总余额</TableHead>
                   <TableHead>可用余额</TableHead>
@@ -111,14 +110,12 @@ export function AccountBalance() {
                   <TableHead>保证金</TableHead>
                   <TableHead>状态</TableHead>
                   <TableHead>更新时间</TableHead>
-                  <TableHead>最后活跃时间</TableHead>
                   <TableHead>操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {accounts.map((account) => (
                   <TableRow key={account.account_id}>
-                    <TableCell className="font-mono text-xs">{account.account_id}</TableCell>
                     <TableCell>{account.ccy}</TableCell>
                     <TableCell className="font-mono">{formatAmount(account.balance?.balance)}</TableCell>
                     <TableCell className="font-mono text-green-600">{formatAmount(account.balance?.available_balance)}</TableCell>
@@ -126,7 +123,6 @@ export function AccountBalance() {
                     <TableCell className="font-mono">{formatAmount(account.balance?.margin_balance)}</TableCell>
                     <TableCell>{getStatusBadge(account.status)}</TableCell>
                     <TableCell className="text-sm">{formatDateTime(account.updated_at)}</TableCell>
-                    <TableCell className="text-sm">{formatDateTime(account.last_active_at)}</TableCell>
                     <TableCell>
                       <Button variant="ghost" size="sm" onClick={() => handleViewDetail(account)}>
                         查看

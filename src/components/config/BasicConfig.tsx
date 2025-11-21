@@ -19,47 +19,22 @@ export function BasicConfig({ config, onConfigUpdate }: BasicConfigProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-4xl">
-          <div className="space-y-1">
-            <Label htmlFor="companyName">名称</Label>
-            <Input
-              id="companyName"
-              value={config.companyName}
-              disabled
-              readOnly
-              className="w-80 bg-gray-50"
-            />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 max-w-4xl">
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-500">名称</Label>
+            <p className="text-base">{config.companyName || '-'}</p>
           </div>
-          <div className="space-y-1">
-            <Label htmlFor="contactName">联系人</Label>
-            <Input
-              id="contactName"
-              value={config.contactName}
-              disabled
-              readOnly
-              className="w-80 bg-gray-50"
-            />
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-500">联系人</Label>
+            <p className="text-base">{config.contactName || '-'}</p>
           </div>
-          <div className="space-y-1">
-            <Label htmlFor="contactPhone">联系电话</Label>
-            <Input
-              id="contactPhone"
-              value={config.contactPhone}
-              disabled
-              readOnly
-              className="w-80 bg-gray-50"
-            />
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-500">联系电话</Label>
+            <p className="text-base">{config.contactPhone || '-'}</p>
           </div>
-          <div className="space-y-1">
-            <Label htmlFor="contactEmail">联系邮箱</Label>
-            <Input
-              id="contactEmail"
-              type="email"
-              value={config.contactEmail}
-              disabled
-              readOnly
-              className="w-80 bg-gray-50"
-            />
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-500">联系邮箱</Label>
+            <p className="text-base">{config.contactEmail || '-'}</p>
           </div>
         </div>
       </CardContent>
