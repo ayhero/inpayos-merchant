@@ -188,3 +188,24 @@ export const getAccountStatusBadgeConfig = (status: string): StatusBadgeConfig =
     className: '' 
   };
 };
+
+// 交易类型 Badge 配置
+export const TRX_TYPE_BADGE_CONFIG: Record<string, StatusBadgeConfig> = {
+  'payin': { label: '代收', variant: 'default', className: 'bg-blue-500' },
+  'payout': { label: '代付', variant: 'default', className: 'bg-purple-500' },
+  'cashier_payin': { label: '出纳代收', variant: 'default', className: 'bg-cyan-500' },
+  'cashier_payout': { label: '出纳代付', variant: 'default', className: 'bg-indigo-500' },
+  'cashier_withdraw': { label: '出纳提现', variant: 'default', className: 'bg-orange-500' },
+  'withdraw': { label: '提现', variant: 'default', className: 'bg-yellow-500' },
+  'refund': { label: '退款', variant: 'secondary', className: 'bg-gray-500' },
+  'deposit': { label: '充值', variant: 'default', className: 'bg-green-500' }
+};
+
+// 获取交易类型 Badge 配置
+export const getTrxTypeBadgeConfig = (trxType: string): StatusBadgeConfig => {
+  return TRX_TYPE_BADGE_CONFIG[trxType] || { 
+    label: trxType || '-', 
+    variant: 'outline' as const, 
+    className: '' 
+  };
+};

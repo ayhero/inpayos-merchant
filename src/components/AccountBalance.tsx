@@ -1,12 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from './ui/card';
-import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { RefreshCw } from 'lucide-react';
 import { accountService, AccountData, AccountListParams } from '../services/accountService';
-import { getAccountStatusBadgeConfig } from '../constants/status';
+import { StatusBadge } from './StatusBadge';
 import { AccountDetail } from './AccountDetail';
 
 
@@ -54,8 +53,7 @@ export function AccountBalance() {
   };
 
   const getStatusBadge = (status: string) => {
-    const config = getAccountStatusBadgeConfig(status);
-    return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>;
+    return <StatusBadge status={status} type="account" />;
   };
 
   const formatDateTime = (timestamp?: number) => {

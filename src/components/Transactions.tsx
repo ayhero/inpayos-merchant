@@ -6,7 +6,12 @@ import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Search, Filter, Download } from 'lucide-react';
+import { Search, Download } from 'lucide-react';
+import { StatusBadge } from './StatusBadge';
+import { 
+  getTrxMethodLabel
+} from '../constants/business';
+import { getTrxTypeBadgeConfig } from '../constants/status';
 import { getStatusDisplayName, getStatusColor } from '../constants/status';
 
 const transactions = [
@@ -18,7 +23,8 @@ const transactions = [
     status: 'success',
     customer: '张三',
     customerEmail: 'zhangsan@example.com',
-    paymentMethod: '支付宝',
+    trxMethod: 'upi',  // 使用标准字段名
+    trxType: 'payin',  // 添加交易类型
     createTime: '2024-01-15 14:30:25',
     completeTime: '2024-01-15 14:30:28',
     description: '商品购买'
@@ -31,10 +37,11 @@ const transactions = [
     status: 'pending',
     customer: '李四',
     customerEmail: 'lisi@example.com',
-    paymentMethod: '微信支付',
-    createTime: '2024-01-15 15:45:12',
+    trxMethod: 'bank_card',
+    trxType: 'payout',
+    createTime: '2024-01-15 15:20:10',
     completeTime: null,
-    description: '服务费用'
+    description: '提现申请'
   },
   {
     id: 'TXN003',
@@ -44,7 +51,8 @@ const transactions = [
     status: 'success',
     customer: '王五',
     customerEmail: 'wangwu@example.com',
-    paymentMethod: '银行卡',
+    trxMethod: 'bank_card',
+    trxType: 'payin',
     createTime: '2024-01-15 16:20:45',
     completeTime: '2024-01-15 16:20:50',
     description: '充值'
@@ -57,7 +65,8 @@ const transactions = [
     status: 'failed',
     customer: '赵六',
     customerEmail: 'zhaoliu@example.com',
-    paymentMethod: '支付宝',
+    trxMethod: 'upi',
+    trxType: 'payin',
     createTime: '2024-01-15 17:10:30',
     completeTime: null,
     description: '商品购买'
@@ -70,7 +79,8 @@ const transactions = [
     status: 'success',
     customer: '孙七',
     customerEmail: 'sunqi@example.com',
-    paymentMethod: '微信支付',
+    trxMethod: 'bank_transfer',
+    trxType: 'payout',
     createTime: '2024-01-15 18:25:15',
     completeTime: '2024-01-15 18:25:18',
     description: '会员充值'
@@ -170,6 +180,7 @@ export function Transactions() {
               <TableRow>
                 <TableHead>交易ID</TableHead>
                 <TableHead>订单号</TableHead>
+                <TableHead>交易类型</TableHead>
                 <TableHead>客户</TableHead>
                 <TableHead>金额</TableHead>
                 <TableHead>支付方式</TableHead>
@@ -183,10 +194,18 @@ export function Transactions() {
                 <TableRow key={transaction.id}>
                   <TableCell className="font-mono text-sm">{transaction.id}</TableCell>
                   <TableCell className="font-mono text-sm">{transaction.orderId}</TableCell>
+                  <TableCell>
+                    {(() => {
+                      const config = getTrxTypeBadgeConfig(transaction.trxType || '');
+                      return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>;
+                    })()}
+                  </TableCell>
                   <TableCell>{transaction.customer}</TableCell>
                   <TableCell>¥{transaction.amount.toFixed(2)}</TableCell>
-                  <TableCell>{transaction.paymentMethod}</TableCell>
-                  <TableCell>{getStatusBadge(transaction.status)}</TableCell>
+                  <TableCell>{getTrxMethodLabel(transaction.trxMethod)}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={transaction.status} type="trx" />
+                  </TableCell>
                   <TableCell>{transaction.createTime}</TableCell>
                   <TableCell>
                     <Dialog>
@@ -225,8 +244,17 @@ export function Transactions() {
                               <p className="text-sm text-muted-foreground">{selectedTransaction.customerEmail}</p>
                             </div>
                             <div>
+                              <label className="font-medium">交易类型</label>
+                              <p className="text-sm text-muted-foreground">
+                                {(() => {
+                                  const config = getTrxTypeBadgeConfig(selectedTransaction.trxType || '');
+                                  return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>;
+                                })()}
+                              </p>
+                            </div>
+                            <div>
                               <label className="font-medium">支付方式</label>
-                              <p className="text-sm text-muted-foreground">{selectedTransaction.paymentMethod}</p>
+                              <p className="text-sm text-muted-foreground">{getTrxMethodLabel(selectedTransaction.trxMethod)}</p>
                             </div>
                             <div>
                               <label className="font-medium">交易状态</label>
