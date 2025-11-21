@@ -1,5 +1,4 @@
 import { Badge } from './ui/badge';
-import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
 import { CurrencyDisplay } from '../utils/currencyMapping';
 import { getAccountStatusBadgeConfig } from '../constants/status';
 import { AccountData } from '../services/accountService';
@@ -28,33 +27,7 @@ export function AccountDetail({ account, formatDateTime, formatAmount }: Account
     <div className="space-y-6 max-h-[500px] overflow-y-auto">
       {/* 基本信息 */}
       <div className="space-y-4">
-        {/* 第一行：用户信息 */}
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label className="text-sm font-medium text-gray-500">商户</label>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <p className="mt-1 text-sm cursor-help underline decoration-dotted">{account.user?.name || '-'}</p>
-              </TooltipTrigger>
-              {account.user && (
-                <TooltipContent side="right" className="max-w-xs">
-                  <div className="space-y-1 text-xs">
-                    <div><span className="text-gray-400">用户ID:</span> {account.user.user_id}</div>
-                    <div><span className="text-gray-400">用户类型:</span> {account.user.user_type}</div>
-                    {account.user.org_id && <div><span className="text-gray-400">所属组织:</span> {account.user.org_id}</div>}
-                    {account.user.phone && <div><span className="text-gray-400">手机号:</span> {account.user.phone}</div>}
-                    {account.user.email && <div><span className="text-gray-400">邮箱:</span> {account.user.email}</div>}
-                    {account.user.status && <div><span className="text-gray-400">状态:</span> {account.user.status}</div>}
-                  </div>
-                </TooltipContent>
-              )}
-            </Tooltip>
-          </div>
-          <div></div>
-          <div></div>
-        </div>
-        
-        {/* 第二行：币种、状态 */}
+        {/* 第一行：币种、状态 */}
         <div className="grid grid-cols-3 gap-4">
           <div>
             <label className="text-sm font-medium text-gray-500">币种</label>
@@ -67,7 +40,7 @@ export function AccountDetail({ account, formatDateTime, formatAmount }: Account
           <div></div>
         </div>
         
-        {/* 第三行：创建时间、更新时间、最后活跃时间 */}
+        {/* 第二行：创建时间、更新时间 */}
         <div className="grid grid-cols-3 gap-4">
           <div>
             <label className="text-sm font-medium text-gray-500">创建时间</label>
@@ -77,10 +50,7 @@ export function AccountDetail({ account, formatDateTime, formatAmount }: Account
             <label className="text-sm font-medium text-gray-500">更新时间</label>
             <p className="mt-1 text-sm">{formatDateTime(account.updated_at)}</p>
           </div>
-          <div>
-            <label className="text-sm font-medium text-gray-500">最后活跃时间</label>
-            <p className="mt-1 text-sm">{formatDateTime(account.last_active_at)}</p>
-          </div>
+          <div></div>
         </div>
       </div>
       
