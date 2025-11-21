@@ -1,4 +1,4 @@
-# InPayOS Cashier后台管理系统
+# Cashier后台管理系统
 
 一个现代化的支付系统Cashier后台管理界面，基于 React + TypeScript + Vite 构建。
 
@@ -111,7 +111,7 @@ npm run lint
 主要环境变量：
 
 ```bash
-VITE_APP_TITLE=InPayOS Cashier后台
+VITE_APP_TITLE=Cashier后台
 VITE_API_BASE_URL=http://localhost:3202
 VITE_APP_ENV=development
 VITE_ENABLE_DEBUG=true

@@ -87,12 +87,6 @@ export default function App() {
       component: Dashboard
     },
     {
-      id: 'checkout',
-      label: '收银台',
-      icon: CreditCard,
-      component: Checkout
-    },
-    {
       id: 'payin',
       label: '代收',
       icon: ArrowDownLeft,
@@ -103,12 +97,6 @@ export default function App() {
       label: '代付',
       icon: ArrowUpRight,
       component: PayoutRecords
-    },
-    {
-      id: 'settlement',
-      label: '结算',
-      icon: Calculator,
-      component: SettlementRecords
     },
     {
       id: 'account',
@@ -168,20 +156,7 @@ export default function App() {
               </div>
             </div>
 
-            {/* 收银台 */}
-            <div className="px-3 mb-4">
-              <div
-                className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer transition-colors ${
-                  activeMenu === 'checkout' 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'hover:bg-muted'
-                }`}
-                onClick={() => setActiveMenu('checkout')}
-              >
-                <CreditCard className="h-4 w-4 flex-shrink-0" />
-                {sidebarOpen && <span>收银台</span>}
-              </div>
-            </div>
+
 
             {/* 交易管理 */}
             <div className="px-3 mb-4">
@@ -191,7 +166,7 @@ export default function App() {
                 </h4>
               )}
               <div className="space-y-1">
-                {menuItems.slice(2, 5).map((item) => (
+                {menuItems.slice(1, 3).map((item) => (
                   <div
                     key={item.id}
                     className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer transition-colors ${
@@ -216,7 +191,7 @@ export default function App() {
                 </h4>
               )}
               <div className="space-y-1">
-                {menuItems.slice(5, 8).map((item) => (
+                {menuItems.slice(3).map((item) => (
                   <div
                     key={item.id}
                     className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer transition-colors ${

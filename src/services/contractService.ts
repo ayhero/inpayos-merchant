@@ -104,8 +104,24 @@ class ContractService {
         };
       }
 
-      // 后端直接返回数组，不再有分页字段
-      const list = Array.isArray(response.data) ? response.data : [];
+      // 统一处理后端返回的数据格式: 可能是数组或带分页的对象
+      let list: Contract[];
+      let total: number;
+      
+      if (Array.isArray(response.data)) {
+        // 后端直接返回数组
+        list = response.data;
+        total = list.length;
+      } else if (response.data.records) {
+        // 后端返回分页格式 { records, total, current, size }
+        list = response.data.records;
+        total = response.data.total || 0;
+      } else {
+        // 兼容其他格式
+        list = response.data.list || [];
+        total = response.data.total || list.length;
+      }
+
       return {
         success: true,
         code: response.code,
@@ -116,7 +132,7 @@ class ContractService {
             page: params.page, 
             size: params.size 
           },
-          total: list.length
+          total: total
         }
       };
     } catch (error: any) {

@@ -119,7 +119,7 @@ jobs:
           
           # 检查应用是否启动成功
           if docker ps | grep inpayos-merchant-prod | grep -q "Up"; then
-            echo "✅ InPayOS Merchant frontend (PROD) is running"
+            echo "✅ Merchant frontend (PROD) is running"
             
             # 检查端口监听
             echo "🔍 Checking port status:"
@@ -137,7 +137,7 @@ jobs:
             echo "📝 Recent logs:"
             docker logs --tail=20 inpayos-merchant-prod
           else
-            echo "❌ InPayOS Merchant container failed to start"
+            echo "❌ Merchant container failed to start"
             docker logs inpayos-merchant-prod
             exit 1
           fi

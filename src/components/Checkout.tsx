@@ -472,7 +472,7 @@ export const Checkout: React.FC = () => {
       <div className="space-y-6">
         {/* 页头 */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold">InPayOS 支付收银台</h1>
+          <h1 className="text-3xl font-bold">支付收银台</h1>
           <p className="text-muted-foreground mt-2">安全、便捷的在线支付解决方案</p>
         </div>
 
@@ -862,7 +862,7 @@ export const Checkout: React.FC = () => {
                         <span>
                           {paymentAccountInfo?.transaction?.holder_name || 
                            paymentAccountInfo?.transaction?.account_name || 
-                           'InPayOS Merchant'}
+                           'Merchant'}
                         </span>
                       </div>
                       {paymentAccountInfo?.transaction?.holder_phone && (
@@ -903,7 +903,7 @@ export const Checkout: React.FC = () => {
                         <span>
                           {paymentAccountInfo?.transaction?.holder_name || 
                            paymentAccountInfo?.transaction?.account_name || 
-                           'InPayOS Merchant Account'}
+                           'Merchant Account'}
                         </span>
                       </div>
                       {paymentAccountInfo?.transaction?.bank_code && (
@@ -945,7 +945,7 @@ export const Checkout: React.FC = () => {
                         <span>
                           {paymentAccountInfo?.transaction?.account_name || 
                            paymentAccountInfo?.transaction?.holder_name || 
-                           'InPayOS Merchant'}
+                           'Merchant'}
                         </span>
                       </div>
                     </>
