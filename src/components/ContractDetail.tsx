@@ -100,9 +100,8 @@ export function ContractDetail({ contract }: ContractDetailProps) {
       {/* 代收配置 */}
       {contract.payin && (
         <div className="border rounded-lg p-4">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4">
             <h3 className="text-lg font-semibold">代收配置</h3>
-            {renderStatusSwitch(contract.payin.status)}
           </div>
           
           {/* 交易配置列表 */}
@@ -164,9 +163,8 @@ export function ContractDetail({ contract }: ContractDetailProps) {
       {/* 代付配置 */}
       {contract.payout && (
         <div className="border rounded-lg p-4">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4">
             <h3 className="text-lg font-semibold">代付配置</h3>
-            {renderStatusSwitch(contract.payout.status)}
           </div>
           
           {/* 交易配置列表 */}

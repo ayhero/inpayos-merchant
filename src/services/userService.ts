@@ -2,7 +2,7 @@ import { api, ApiResponse } from './api';
 
 // 用户信息接口类型定义
 export interface UserInfo {
-  mid: string;
+  user_id: string;
   name: string;
   type: string;
   email: string;

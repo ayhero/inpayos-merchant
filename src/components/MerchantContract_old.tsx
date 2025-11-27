@@ -265,9 +265,8 @@ export function MerchantContract() {
               {/* 代收配置 */}
               {selectedContract.payin && (
                 <div className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="mb-4">
                     <h3 className="text-lg font-semibold">代收配置</h3>
-                    {getStatusBadge(selectedContract.payin.status)}
                   </div>
                   
                   {/* 交易配置列表 */}
@@ -332,9 +331,8 @@ export function MerchantContract() {
               {/* 代付配置 */}
               {selectedContract.payout && (
                 <div className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="mb-4">
                     <h3 className="text-lg font-semibold">代付配置</h3>
-                    {getStatusBadge(selectedContract.payout.status)}
                   </div>
                   
                   {/* 交易配置列表 */}
