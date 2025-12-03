@@ -99,6 +99,8 @@ interface BackendTransactionInfo {
   settle_status?: string;
   settle_id?: string;
   settled_at?: number; // 毫秒时间戳
+  settle_amount?: string;
+  settle_usd_amount?: string;
   refunded_count?: number;
   refunded_amount?: string;
   refunded_usd_amount?: string;
@@ -147,6 +149,8 @@ export interface TransactionInfo {
   settleStatus?: SettleStatus;
   settleID?: string;
   settledAt?: string;
+  settleAmount?: string;
+  settleUsdAmount?: string;
   refundedCount?: number;
   refundedAmount?: string;
   refundedUsdAmount?: string;
@@ -232,6 +236,8 @@ const convertBackendToFrontend = (backend: BackendTransactionInfo): TransactionI
     settleStatus: backend.settle_status ? (backend.settle_status as unknown as SettleStatus) : undefined,
     settleID: backend.settle_id,
     settledAt: timestampToISOString(backend.settled_at),
+    settleAmount: backend.settle_amount,
+    settleUsdAmount: backend.settle_usd_amount,
     refundedCount: backend.refunded_count,
     refundedAmount: backend.refunded_amount,
     refundedUsdAmount: backend.refunded_usd_amount,

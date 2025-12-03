@@ -156,8 +156,7 @@ export function PayoutRecords() {
 
   const formatCurrency = (amount: string, currency: string) => {
     const num = parseFloat(amount);
-    const symbol = currency === 'INR' ? '₹' : currency === 'USDT' ? '' : '$';
-    return `${symbol}${num.toLocaleString()} ${currency}`;
+    return `${currency} ${num.toLocaleString()}`;
   };
 
   // 模态窗专用的金额格式化函数，格式为"币种 金额"
@@ -418,12 +417,12 @@ export function PayoutRecords() {
                                   <div>
                                     <label className="text-sm text-muted-foreground">结算金额</label>
                                     <p className="text-base font-semibold mt-1">
-                                      {selectedRecord.settleStatus === 1 ? 
-                                        formatCurrencyForModal(selectedRecord.amount, selectedRecord.ccy) : '-'}
+                                      {selectedRecord.settleAmount ? 
+                                        formatCurrencyForModal(selectedRecord.settleAmount, selectedRecord.ccy) : '-'}
                                     </p>
                                   </div>
                                   <div>
-                                    <label className="text-sm text-muted-foreground">手续费金额</label>
+                                    <label className="text-sm text-muted-foreground">手续费</label>
                                     <p className="text-base font-semibold mt-1">
                                       {selectedRecord.feeAmount ? 
                                         formatCurrency(selectedRecord.feeAmount, selectedRecord.feeCcy || selectedRecord.ccy) : '-'}
