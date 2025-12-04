@@ -1,0 +1,142 @@
+name: AWS Prod2 Deployment
+
+on:
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  AWS_HOST: 52.66.146.93  # Prod2服务器IP
+  API_HOST: 52.66.146.93
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Create environment file
+      run: |
+        echo "${{ secrets.ENV }}" > .env.production
+        echo "📄 Environment configuration loaded from secrets"
+        cat .env.production
+
+    - name: Build application
+      run: |
+        # Use environment variables from .env.production file
+        npx vite build --mode production
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=prod-latest
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: PROD2
+    needs: build
+    
+    steps:
+    - name: Deploy to Prod2 Server
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ env.AWS_HOST }}
+        username: dev
+        key: ${{ secrets.AWS_SSH_KEY }}
+        port: 22
+        timeout: 30s
+        command_timeout: 10m
+        script: |
+          # 创建应用目录
+          mkdir -p /opt/inpayos-merchant/logs
+          cd /opt/inpayos-merchant
+          
+          # 登录到 GitHub Container Registry
+          echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          
+          # 停止并删除现有容器
+          docker stop inpayos-merchant-prod || true
+          docker rm inpayos-merchant-prod || true
+          
+          # 拉取最新镜像
+          docker pull ghcr.io/ayhero/inpayos-merchant:prod2-latest
+          
+          # 创建环境配置文件
+          echo '${{ secrets.ENV }}' > .env.production
+          
+          # 启动应用容器（nginx + 前端静态文件）
+          docker run -d \
+            --name inpayos-merchant-prod \
+            --restart unless-stopped \
+            -p 3101:80 \
+            -v /opt/inpayos-merchant/logs:/var/log/nginx \
+            -v /opt/inpayos-merchant/.env.production:/app/.env.production \
+            --add-host host.docker.internal:host-gateway \
+            ghcr.io/ayhero/inpayos-merchant:prod-latest
+          
+          # 等待服务启动
+          sleep 15
+          
+          # 检查容器状态
+          echo "🔍 Checking container status:"
+          docker ps -a | grep inpayos-merchant-prod
+          
+          # 检查应用是否启动成功
+          if docker ps | grep inpayos-merchant-prod | grep -q "Up"; then
+            echo "✅ Merchant frontend (PROD) is running"
+            
+            # 检查端口监听
+            echo "🔍 Checking port status:"
+            netstat -tlnp | grep ":3101" || echo "Port 3101 may still be binding..."
+            
+            # 尝试健康检查
+            echo "🏥 Health check:"
+            if curl -f http://localhost:3101 2>/dev/null; then
+              echo "✅ Merchant frontend health check passed"
+            else
+              echo "⚠️ Merchant frontend health check failed (may still be starting)"
+            fi
+            
+            # 显示最近日志
+            echo "📝 Recent logs:"
+            docker logs --tail=20 inpayos-merchant-prod
+          else
+            echo "❌ Merchant container failed to start"
+            docker logs inpayos-merchant-prod
+            exit 1
+          fi
