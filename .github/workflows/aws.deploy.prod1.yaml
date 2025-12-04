@@ -68,7 +68,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    environment: PROD1
+    environment: PROD
     needs: build
     
     steps:
@@ -94,7 +94,7 @@ jobs:
           docker rm inpayos-merchant-prod || true
           
           # 拉取最新镜像
-          docker pull ghcr.io/ayhero/inpayos-merchant:prod1-latest
+          docker pull ghcr.io/ayhero/inpayos-merchant:prod-latest
           
           # 创建环境配置文件
           echo '${{ secrets.ENV }}' > .env.production
