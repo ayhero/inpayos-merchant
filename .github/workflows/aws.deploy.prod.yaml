@@ -8,8 +8,8 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  AWS_HOST: 43.204.234.146  # 替换为生产环境IP
-  API_HOST: 43.204.234.146  # 替换为生产环境IP
+  AWS_HOST: 13.127.163.14  # 生产环境IP
+  API_HOST: 13.127.163.14  # 生产环境IP
 
 jobs:
   build:
@@ -78,15 +78,15 @@ jobs:
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ env.AWS_HOST }}
-        username: root
+        username: dev
         key: ${{ secrets.AWS_SSH_KEY }}
         port: 22
         timeout: 30s
         command_timeout: 10m
         script: |
           # 创建应用目录
-          mkdir -p /root/inpayos-merchant-prod/logs
-          cd /root/inpayos-merchant-prod
+          mkdir -p /opt/inpayos-merchant/logs
+          cd /opt/inpayos-merchant
           
           # 登录到 GitHub Container Registry
           echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
@@ -106,8 +106,8 @@ jobs:
             --name inpayos-merchant-prod \
             --restart unless-stopped \
             -p 3101:80 \
-            -v /root/inpayos-merchant-prod/logs:/var/log/nginx \
-            -v /root/inpayos-merchant-prod/.env.production:/app/.env.production \
+            -v /opt/inpayos-merchant/logs:/var/log/nginx \
+            -v /opt/inpayos-merchant/.env.production:/app/.env.production \
             ghcr.io/ayhero/inpayos-merchant:prod-latest
           
           # 等待服务启动
