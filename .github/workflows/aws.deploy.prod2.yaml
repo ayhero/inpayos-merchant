@@ -68,7 +68,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    environment: PROD2
+    environment: PROD
     needs: build
     
     steps:
