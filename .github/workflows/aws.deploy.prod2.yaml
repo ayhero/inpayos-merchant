@@ -99,11 +99,10 @@ jobs:
             --name ${{env.IMAGE_NAME}} \
             --restart unless-stopped \
             -p 3101:80 \
-            -e TARGET_HOST=172.31.42.93 \
             -v /opt/inpayos-merchant/logs:/var/log/nginx \
             -v /opt/inpayos-merchant/.env.production:/app/.env.production \
             --add-host host.docker.internal:host-gateway \
-            ghcr.io/ayhero/inpayos-merchant:${{ env.VERSION }}
+            ghcr.io/ayhero/${{env.IMAGE_NAME}}:${{ env.VERSION }}
           
           # 等待服务启动
           sleep 15
