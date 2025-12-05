@@ -5,9 +5,10 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: inpayos-merchant-frontend
   AWS_HOST: 13.127.163.14  # Prod1服务器IP
   API_HOST: 13.127.163.14
+  VERSION: prod-latest
 
 jobs:
   build:
@@ -47,24 +48,13 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Extract metadata
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-        tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=sha,prefix={{branch}}-
-          type=raw,value=prod-latest
-
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+    - name: Build Docker image
+      run: |
+        # 构建镜像
+        docker build -t ${{ env.IMAGE_NAME }}:${{ env.VERSION }} .
+        docker tag ${{ env.IMAGE_NAME }}:${{ env.VERSION }} ${{ env.IMAGE_NAME }}:latest
+        
+        echo "VERSION=${{ env.VERSION }}" >> $GITHUB_ENV
 
   deploy:
     runs-on: ubuntu-latest
@@ -90,34 +80,34 @@ jobs:
           echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           
           # 停止并删除现有容器
-          docker stop inpayos-merchant-frontend || true
-          docker rm inpayos-merchant-frontend || true
+          docker stop ${{env.IMAGE_NAME}} || true
+          docker rm ${{env.IMAGE_NAME}} || true
           
           # 拉取最新镜像
-          docker pull ghcr.io/ayhero/inpayos-merchant:prod2-latest
+          docker pull ghcr.io/ayhero/${{env.IMAGE_NAME}}:${{ env.VERSION }}
           
           # 创建环境配置文件
           echo '${{ secrets.ENV }}' > .env.production
           
           # 启动应用容器（nginx + 前端静态文件）
           docker run -d \
-            --name inpayos-merchant-frontend \
+            --name ${{env.IMAGE_NAME}} \
             --restart unless-stopped \
             -p 3101:80 \
             -v /opt/inpayos-merchant/logs:/var/log/nginx \
             -v /opt/inpayos-merchant/.env.production:/app/.env.production \
             --add-host host.docker.internal:host-gateway \
-            ghcr.io/ayhero/inpayos-merchant:prod-latest
+            ghcr.io/ayhero/${{env.IMAGE_NAME}}:${{ env.VERSION }}
           
           # 等待服务启动
           sleep 15
           
           # 检查容器状态
           echo "🔍 Checking container status:"
-          docker ps -a | grep inpayos-merchant-frontend
+          docker ps -a | grep ${{env.IMAGE_NAME}}
           
           # 检查应用是否启动成功
-          if docker ps | grep inpayos-merchant-frontend | grep -q "Up"; then
+          if docker ps | grep ${{env.IMAGE_NAME}} | grep -q "Up"; then
             echo "✅ Merchant frontend (PROD) is running"
             
             # 检查端口监听
