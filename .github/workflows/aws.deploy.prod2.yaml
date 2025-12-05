@@ -129,9 +129,9 @@ jobs:
             
             # 显示最近日志
             echo "📝 Recent logs:"
-            docker logs --tail=20 inpayos-merchant-prod
+            docker logs --tail=20 ${{env.IMAGE_NAME}}
           else
             echo "❌ Merchant container failed to start"
-            docker logs inpayos-merchant-prod
+            docker logs ${{env.IMAGE_NAME}}
             exit 1
           fi
