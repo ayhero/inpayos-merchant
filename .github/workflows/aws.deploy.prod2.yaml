@@ -102,6 +102,7 @@ jobs:
             -e TARGET_HOST=172.31.42.93 \
             -v /opt/inpayos-merchant/logs:/var/log/nginx \
             -v /opt/inpayos-merchant/.env.production:/app/.env.production \
+            --add-host host.docker.internal:host-gateway \
             ghcr.io/ayhero/inpayos-merchant:${{ env.VERSION }}
           
           # 等待服务启动
