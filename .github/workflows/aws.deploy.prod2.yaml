@@ -94,7 +94,7 @@ jobs:
           docker rm inpayos-merchant-frontend || true
           
           # 拉取最新镜像
-          docker pull ghcr.io/ayhero/inpayos-merchant:prod2-latest
+          docker pull ghcr.io/ayhero/inpayos-merchant:prod-latest
           
           # 创建环境配置文件
           echo '${{ secrets.ENV }}' > .env.production
@@ -104,9 +104,9 @@ jobs:
             --name inpayos-merchant-frontend \
             --restart unless-stopped \
             -p 3101:80 \
+            -e TARGET_HOST=172.31.42.93 \
             -v /opt/inpayos-merchant/logs:/var/log/nginx \
             -v /opt/inpayos-merchant/.env.production:/app/.env.production \
-            --add-host host.docker.internal:host-gateway \
             ghcr.io/ayhero/inpayos-merchant:prod-latest
           
           # 等待服务启动
