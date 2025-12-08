@@ -10,6 +10,19 @@ export interface PaymentLimits {
   dailyLimit: number;
 }
 
+// API密钥信息
+export interface ApiSecret {
+  id: number;
+  user_id: string;
+  app_id: string;
+  app_name: string;
+  secret_key: string;
+  status: string;
+  expires_at: number;
+  created_at: number;
+  updated_at: number;
+}
+
 export interface MerchantConfigState {
   // 基本信息
   companyName: string;
@@ -18,7 +31,7 @@ export interface MerchantConfigState {
   contactEmail: string;
   
   // API配置
-  apiKey: string;
+  secrets: ApiSecret[];
   webhookUrl: string;
   
   // 代收配置
@@ -53,7 +66,7 @@ export const DEFAULT_CONFIG: MerchantConfigState = {
   contactEmail: '',
   
   // API配置 - 从API加载真实数据
-  apiKey: '',
+  secrets: [],
   webhookUrl: '',
   
   // 代收配置

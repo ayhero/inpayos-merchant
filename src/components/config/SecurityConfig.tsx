@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Key, Smartphone, RotateCcw, Save } from 'lucide-react';
@@ -44,49 +45,47 @@ export const SecurityConfig: React.FC<SecurityConfigProps> = ({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Key className="h-5 w-5" />
-          安全配置
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* IP白名单配置 - 单独一行 */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="ipWhitelist">IP白名单</Label>
+    <>
+      {/* IP白名单 */}
+      <Card>
+        <CardHeader>
+          <CardTitle>IP白名单</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
             <p className="text-sm text-gray-500">
-              为空表示不限制IP访问
+              允许访问API的IP地址，多个IP用逗号分隔，留空表示不限制。
             </p>
+            <div className="flex items-center gap-2">
+              <Textarea
+                id="ipWhitelist"
+                value={getIpWhitelistValue()}
+                onChange={(e) => handleIpWhitelistChange(e.target.value)}
+                placeholder="192.168.1.1,192.168.1.0/24"
+                className="max-w-2xl h-20 resize-none"
+              />
+              <Button 
+                className="shrink-0 h-10"
+                disabled={loading}
+                onClick={onSaveIpWhitelist}
+              >
+                保存
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Input
-              id="ipWhitelist"
-              value={getIpWhitelistValue()}
-              onChange={(e) => handleIpWhitelistChange(e.target.value)}
-              placeholder="多个IP用逗号分隔，如：192.168.1.1,192.168.1.0/24"
-              className="w-80 h-10"
-            />
-            <Button 
-              className="gap-2 shrink-0 h-10"
-              disabled={loading}
-              onClick={onSaveIpWhitelist}
-            >
-              <Save className="h-4 w-4" />
-              保存IP白名单
-            </Button>
-          </div>
-        </div>
-        
-        {/* Google验证配置 - 与IP白名单高度对齐 */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Label className="text-base">Google Authenticator</Label>
+        </CardContent>
+      </Card>
+
+      {/* Google Authenticator */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Google Authenticator</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
             <p className="text-sm text-gray-500">
-              启用两步验证以增强账户安全性
+              用于二次验证的Google Authenticator密钥，请妥善保管。
             </p>
-          </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2">
               {googleAuthEnabled ? (
@@ -124,5 +123,6 @@ export const SecurityConfig: React.FC<SecurityConfigProps> = ({
         </div>
       </CardContent>
     </Card>
+    </>
   );
 };

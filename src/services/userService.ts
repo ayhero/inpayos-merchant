@@ -1,5 +1,18 @@
 import { api, ApiResponse } from './api';
 
+// API密钥信息
+export interface Secret {
+  id: number;
+  user_id: string;
+  app_id: string;
+  app_name: string;
+  secret_key: string;
+  status: string;
+  expires_at: number;
+  created_at: number;
+  updated_at: number;
+}
+
 // 用户信息接口类型定义
 export interface UserInfo {
   user_id: string;
@@ -9,6 +22,9 @@ export interface UserInfo {
   phone: string;
   status: number;
   has_g2fa: boolean;
+  white_list_ip?: string;  // IP白名单，逗号分隔的字符串
+  notify_url?: string;     // 回调URL
+  secrets?: Secret[];      // API密钥列表
 }
 
 // 用户服务类
