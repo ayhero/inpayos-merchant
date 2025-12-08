@@ -104,11 +104,15 @@ interface BackendTransactionInfo {
   refunded_count?: number;
   refunded_amount?: string;
   refunded_usd_amount?: string;
-  last_refunded_at?: number; // 毫秒时间戳
+  last_refunded_at?: number; // 毫秒时闳戳
   detail?: any;
   mid?: string;
   product_id?: string;
   version?: number;
+  notify_url?: string;
+  notify_status?: string;
+  notified_at?: number; // 毫秒时闳戳
+  notify_count?: number;
 }
 
 // 统一交易信息接口 - 与后端 protocol.TransactionInfo 保持一致
@@ -156,6 +160,10 @@ export interface TransactionInfo {
   refundedUsdAmount?: string;
   lastRefundedAt?: string;
   detail?: string;
+  notifyURL?: string;
+  notifyStatus?: string;
+  notifiedAt?: string;
+  notifyCount?: number;
 }
 
 // 查询参数接口
@@ -172,6 +180,7 @@ export interface TransactionQueryParams {
   reqID?: string;
   uid?: string;
   channelCode?: string;
+  keyword?: string;
 }
 
 // 分页响应接口
@@ -243,6 +252,10 @@ const convertBackendToFrontend = (backend: BackendTransactionInfo): TransactionI
     refundedUsdAmount: backend.refunded_usd_amount,
     lastRefundedAt: timestampToISOString(backend.last_refunded_at),
     detail: backend.detail ? JSON.stringify(backend.detail) : undefined,
+    notifyURL: backend.notify_url,
+    notifyStatus: backend.notify_status,
+    notifiedAt: timestampToISOString(backend.notified_at),
+    notifyCount: backend.notify_count,
   };
 };
 
@@ -273,6 +286,9 @@ export const transactionService = {
       }
       if (params.reqID) {
         queryParams.req_id = params.reqID;
+      }
+      if (params.keyword) {
+        queryParams.keyword = params.keyword;
       }
       if (params.startDate) {
         queryParams.created_at_start = Math.floor(new Date(params.startDate).getTime() / 1000);
@@ -410,29 +426,19 @@ export const transactionService = {
     }
   },
 
-  // 重试通知 - 如果后端有对应接口，可以修改为真实调用
-  retryNotification: async (trxID: string): Promise<ApiResponse<null>> => {
+  // 重试通知 - 调用后端通知接口
+  retryNotification: async (trxID: string, trxType: TransactionType): Promise<ApiResponse<null>> => {
     try {
-      // 这里假设后端有重试通知的接口，需要根据实际情况调整
-      // const response = await api.post('/transactions/retry-notification', { trx_id: trxID });
-      
-      // 暂时使用模拟响应
-      console.log('Retrying notification for transaction:', trxID);
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            code: '200',
-            msg: '重试通知成功',
-            success: true,
-            data: null
-          });
-        }, 1000);
+      const response = await api.post<ApiResponse<null>>('/transactions/notify', {
+        trx_id: trxID,
+        trx_type: trxType
       });
+      return response.data;
     } catch (error: any) {
       console.error('重试通知失败:', error);
       return {
-        code: '500',
-        msg: error.message || '网络错误',
+        code: error.response?.data?.code || '500',
+        msg: error.response?.data?.msg || error.message || '网络错误',
         success: false,
         data: null,
       };

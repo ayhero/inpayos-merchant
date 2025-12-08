@@ -6,7 +6,8 @@ import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Search, Filter, Download, RefreshCw } from 'lucide-react';
+import { Search, Filter, Download, RefreshCw, Bell, Eye } from 'lucide-react';
+import { toast } from '../utils/toast';
 import { 
   transactionService, 
   TransactionInfo, 
@@ -24,6 +25,7 @@ export function PayoutRecords() {
   const [selectedRecord, setSelectedRecord] = useState<TransactionInfo | null>(null);
   const [records, setRecords] = useState<TransactionInfo[]>([]);
   const [loading, setLoading] = useState(false);
+  const [notifying, setNotifying] = useState<string | null>(null);
   const [todayStats, setTodayStats] = useState<TodayStats | null>(null);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -31,6 +33,23 @@ export function PayoutRecords() {
     total: 0,
     totalPages: 0
   });
+
+  // 处理通知
+  const handleNotify = async (trxID: string) => {
+    setNotifying(trxID);
+    try {
+      const response = await transactionService.retryNotification(trxID, TransactionType.PAYOUT);
+      if (response.success) {
+        toast.success('通知成功', '交易通知已发送');
+      } else {
+        toast.error('通知失败', response.msg || '发送通知失败，请稍后重试');
+      }
+    } catch (error) {
+      toast.error('通知失败', '发送通知失败，请稍后重试');
+    } finally {
+      setNotifying(null);
+    }
+  };
 
   // 获取今日统计
   const fetchTodayStats = async () => {
@@ -76,7 +95,7 @@ export function PayoutRecords() {
         params.status = statusFilter as TransactionStatus;
       }
       if (searchTerm) {
-        params.trxID = searchTerm;
+        params.keyword = searchTerm;
       }
 
       const response = await transactionService.getTransactions(params);
@@ -281,6 +300,7 @@ export function PayoutRecords() {
                 <TableHead>金额</TableHead>
                 <TableHead>支付方式</TableHead>
                 <TableHead>状态</TableHead>
+                <TableHead>通知</TableHead>
                 <TableHead>创建时间</TableHead>
                 <TableHead>完成时间</TableHead>
                 <TableHead>操作</TableHead>
@@ -298,10 +318,34 @@ export function PayoutRecords() {
                     <PaymentMethodDisplay method={record.trxMethod} />
                   </TableCell>
                   <TableCell>{getStatusBadge(record.status)}</TableCell>
+                  <TableCell>
+                    {record.notifyStatus ? (
+                      <div className="flex flex-col gap-1">
+                        <Badge variant={record.notifyStatus === 'success' ? 'default' : 'secondary'} className="text-xs">
+                          {record.notifyStatus === 'success' ? '已通知' : record.notifyStatus === 'failed' ? '失败' : '待通知'}
+                        </Badge>
+                        {record.notifiedAt && (
+                          <span className="text-xs text-muted-foreground">{formatDateTime(record.notifiedAt)}</span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
                   <TableCell>{formatDateTime(record.createdAt)}</TableCell>
                   <TableCell>{record.completedAt ? formatDateTime(record.completedAt) : '-'}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleNotify(record.trxID)}
+                        disabled={notifying === record.trxID}
+                        className="gap-1"
+                      >
+                        <Bell className="h-3 w-3" />
+                        {notifying === record.trxID ? '发送中...' : '通知'}
+                      </Button>
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button 
@@ -309,6 +353,7 @@ export function PayoutRecords() {
                             size="sm"
                             onClick={() => setSelectedRecord(record)}
                           >
+                            <Eye className="mr-1 h-4 w-4" />
                             详情
                           </Button>
                         </DialogTrigger>
@@ -374,16 +419,8 @@ export function PayoutRecords() {
                                     </p>
                                   </div>
                                   <div>
-                                    <label className="text-sm text-muted-foreground">取消时间</label>
-                                    <p className="text-base font-semibold mt-1">-</p>
-                                  </div>
-                                  <div>
-                                    <label className="text-sm text-muted-foreground">Reference ID</label>
+                                    <label className="text-sm text-muted-foreground">凭证ID</label>
                                     <p className="text-base font-semibold font-mono mt-1">{selectedRecord.flowNo || '-'}</p>
-                                  </div>
-                                  <div>
-                                    <label className="text-sm text-muted-foreground">Checkout ID</label>
-                                    <p className="text-base font-semibold font-mono mt-1">{selectedRecord.mid || '-'}</p>
                                   </div>
                                   <div className="col-span-2">
                                     <label className="text-sm text-muted-foreground">备注</label>
@@ -427,6 +464,39 @@ export function PayoutRecords() {
                                       {selectedRecord.feeAmount ? 
                                         formatCurrency(selectedRecord.feeAmount, selectedRecord.feeCcy || selectedRecord.ccy) : '-'}
                                     </p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* 通知信息模块 */}
+                              <div className="bg-purple-50 dark:bg-purple-900/50 border border-purple-200 dark:border-purple-700 rounded-lg p-4">
+                                <h3 className="text-lg font-semibold mb-4 text-purple-700 dark:text-purple-300">通知信息</h3>
+                                <div className="grid grid-cols-3 gap-4">
+                                  <div>
+                                    <label className="text-sm text-muted-foreground">通知状态</label>
+                                    <p className="text-base font-semibold mt-1">
+                                      {selectedRecord.notifyStatus === 'success' ? (
+                                        <Badge variant="default">已通知</Badge>
+                                      ) : selectedRecord.notifyStatus === 'failed' ? (
+                                        <Badge variant="destructive">通知失败</Badge>
+                                      ) : (
+                                        <Badge variant="secondary">待通知</Badge>
+                                      )}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <label className="text-sm text-muted-foreground">通知时间</label>
+                                    <p className="text-base font-semibold mt-1">
+                                      {selectedRecord.notifiedAt ? formatDateTime(selectedRecord.notifiedAt) : '-'}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <label className="text-sm text-muted-foreground">通知次数</label>
+                                    <p className="text-base font-semibold mt-1">{selectedRecord.notifyCount || 0} 次</p>
+                                  </div>
+                                  <div className="col-span-3">
+                                    <label className="text-sm text-muted-foreground">通知地址</label>
+                                    <p className="text-base font-mono text-sm mt-1 break-all">{selectedRecord.notifyURL || '-'}</p>
                                   </div>
                                 </div>
                               </div>
