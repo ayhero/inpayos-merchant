@@ -46,44 +46,44 @@ export interface MerchantConfigState {
 }
 
 export const DEFAULT_CONFIG: MerchantConfigState = {
-  // 基本信息
-  companyName: '示例商户有限公司',
-  contactName: '张经理',
-  contactPhone: '+91-9876543210',
-  contactEmail: 'contact@example.com',
+  // 基本信息 - 从API加载真实数据
+  companyName: '',
+  contactName: '',
+  contactPhone: '',
+  contactEmail: '',
   
-  // API配置
-  apiKey: 'sk_live_india_123456789abcdef',
-  webhookUrl: 'https://merchant.example.com/webhook',
+  // API配置 - 从API加载真实数据
+  apiKey: '',
+  webhookUrl: '',
   
   // 代收配置
   collectionEnabled: true,
   collectionMethods: {
-    upi: { enabled: true, status: 'active', feeRate: 0.5 },
-    bankCard: { enabled: true, status: 'active', feeRate: 1.0 },
-    usdt: { enabled: false, status: 'pending', feeRate: 0.3 }
+    upi: { enabled: false, status: 'inactive', feeRate: 0 },
+    bankCard: { enabled: false, status: 'inactive', feeRate: 0 },
+    usdt: { enabled: false, status: 'inactive', feeRate: 0 }
   },
   collectionLimits: {
-    minAmount: 100,
-    maxAmount: 1000000,
-    dailyLimit: 10000000
+    minAmount: 0,
+    maxAmount: 0,
+    dailyLimit: 0
   },
   
   // 代付配置
-  payoutEnabled: true,
+  payoutEnabled: false,
   payoutMethods: {
-    upi: { enabled: true, status: 'active', feeRate: 0.2 },
-    bankTransfer: { enabled: true, status: 'active', feeRate: 0.1 },
-    usdt: { enabled: false, status: 'inactive', feeRate: 0.1 }
+    upi: { enabled: false, status: 'inactive', feeRate: 0 },
+    bankTransfer: { enabled: false, status: 'inactive', feeRate: 0 },
+    usdt: { enabled: false, status: 'inactive', feeRate: 0 }
   },
   payoutLimits: {
-    minAmount: 100,
-    maxAmount: 500000,
-    dailyLimit: 5000000
+    minAmount: 0,
+    maxAmount: 0,
+    dailyLimit: 0
   },
   
   // 安全配置
-  ipWhitelist: ['103.224.182.242', '203.192.225.116'],
+  ipWhitelist: [],
   enableTwoFactor: false,
   sessionTimeout: '30'
 };

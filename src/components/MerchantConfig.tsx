@@ -12,7 +12,7 @@ import { api } from '../services/api';
 
 import { DEFAULT_CONFIG, MerchantConfigState } from './config/merchantConstants';
 import { updateConfig } from './config/configHelpers';
-import { BasicConfig } from './config/BasicConfig';
+// import { BasicConfig } from './config/BasicConfig';  // 商户基本信息模块已注释
 import { ApiConfig } from './config/ApiConfig';
 import { SecurityConfig } from './config/SecurityConfig';
 
@@ -34,53 +34,53 @@ export function MerchantConfig() {
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [isRebinding, setIsRebinding] = useState(false);
 
-  // 保存 Webhook URL
-  const handleSaveWebhook = async () => {
-    try {
-      setLoading(true);
-      const response = await api.post('/merchant-admin/save', {
-        notify_url: config.webhookUrl
-      });
-      
-      if (response.code === '0000') {
-        toast.success("保存成功", "Webhook URL已更新");
-      } else {
-        toast.error("保存失败", response.msg || "保存Webhook URL失败");
-      }
-    } catch (error) {
-      console.error('保存Webhook URL失败:', error);
-      toast.error("保存失败", "网络错误，请稍后重试");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // 保存 Webhook URL - 接口暂不可用，已禁用
+  // const handleSaveWebhook = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const response = await api.post('/merchant-admin/save', {
+  //       notify_url: config.webhookUrl
+  //     });
+  //     
+  //     if (response.code === '0000') {
+  //       toast.success("保存成功", "Webhook URL已更新");
+  //     } else {
+  //       toast.error("保存失败", response.msg || "保存Webhook URL失败");
+  //     }
+  //   } catch (error) {
+  //     console.error('保存Webhook URL失败:', error);
+  //     toast.error("保存失败", "网络错误，请稍后重试");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  // 保存 IP 白名单
-  const handleSaveIpWhitelist = async () => {
-    try {
-      setLoading(true);
-      
-      // 将 IP 白名单数组转换为逗号分隔的字符串
-      const ipWhitelistStr = Array.isArray(config.ipWhitelist) 
-        ? config.ipWhitelist.join(',') 
-        : config.ipWhitelist;
-      
-      const response = await api.post('/merchant-admin/save', {
-        white_list_ip: ipWhitelistStr
-      });
-      
-      if (response.code === '0000') {
-        toast.success("保存成功", "IP白名单已更新");
-      } else {
-        toast.error("保存失败", response.msg || "保存IP白名单失败");
-      }
-    } catch (error) {
-      console.error('保存IP白名单失败:', error);
-      toast.error("保存失败", "网络错误，请稍后重试");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // 保存 IP 白名单 - 接口暂不可用，已禁用
+  // const handleSaveIpWhitelist = async () => {
+  //   try {
+  //     setLoading(true);
+  //     
+  //     // 将 IP 白名单数组转换为逗号分隔的字符串
+  //     const ipWhitelistStr = Array.isArray(config.ipWhitelist) 
+  //       ? config.ipWhitelist.join(',') 
+  //       : config.ipWhitelist;
+  //     
+  //     const response = await api.post('/merchant-admin/save', {
+  //       white_list_ip: ipWhitelistStr
+  //     });
+  //     
+  //     if (response.code === '0000') {
+  //       toast.success("保存成功", "IP白名单已更新");
+  //     } else {
+  //       toast.error("保存失败", response.msg || "保存IP白名单失败");
+  //     }
+  //   } catch (error) {
+  //     console.error('保存IP白名单失败:', error);
+  //     toast.error("保存失败", "网络错误，请稍后重试");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleConfigUpdate = (key: keyof MerchantConfigState, value: any) => {
     setConfig(prev => updateConfig(prev, key, value));
@@ -273,11 +273,11 @@ export function MerchantConfig() {
         <h1>商户配置</h1>
       </div>
 
-      {/* 基本信息 */}
-      <BasicConfig 
+      {/* 基本信息 - 已注释，不展示 */}
+      {/* <BasicConfig 
         config={config}
         onConfigUpdate={handleConfigUpdate}
-      />
+      /> */}
 
       {/* API配置 */}
       <ApiConfig 
@@ -285,7 +285,7 @@ export function MerchantConfig() {
         onConfigUpdate={handleConfigUpdate}
         showApiKey={showApiKey}
         onToggleApiKey={() => setShowApiKey(!showApiKey)}
-        onSaveWebhook={handleSaveWebhook}
+        onSaveWebhook={() => toast.error("功能暂不可用", "保存接口尚未实现")}
         loading={loading}
       />
 
@@ -298,7 +298,7 @@ export function MerchantConfig() {
         isSendingCode={isSendingCode}
         onGetG2FAKey={handleGetG2FAKey}
         onStartRebind={handleStartRebind}
-        onSaveIpWhitelist={handleSaveIpWhitelist}
+        onSaveIpWhitelist={() => toast.error("功能暂不可用", "保存接口尚未实现")}
       />
 
       {/* G2FA 配置对话框 */}

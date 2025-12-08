@@ -104,12 +104,12 @@ export default function App() {
       icon: Wallet,
       component: AccountBalance
     },
-    {
-      id: 'contract',
-      label: '合约',
-      icon: FileText,
-      component: MerchantContract
-    },
+    // {
+    //   id: 'contract',
+    //   label: '合约',
+    //   icon: FileText,
+    //   component: MerchantContract
+    // },
     {
       id: 'config',
       label: '设置',

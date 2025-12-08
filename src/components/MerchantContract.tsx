@@ -19,7 +19,7 @@ export function MerchantContract() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchContracts = useCallback(async () => {
-    if (!currentUser?.mid) return;
+    if (!currentUser?.user_id) return;
     
     setLoading(true);
     setError(null);
@@ -27,7 +27,7 @@ export function MerchantContract() {
       const params: ContractListParams = {
         page: 1,
         size: 50,
-        sid: currentUser.mid,
+        sid: currentUser.user_id,
         stype: 'merchant'
       };
 
@@ -45,7 +45,7 @@ export function MerchantContract() {
     } finally {
       setLoading(false);
     }
-  }, [currentUser?.mid]);
+  }, [currentUser?.user_id]);
 
   useEffect(() => {
     fetchContracts();
