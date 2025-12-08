@@ -103,19 +103,19 @@ export default function App() {
       label: '账户',
       icon: Wallet,
       component: AccountBalance
-    },
+    }
     // {
     //   id: 'contract',
     //   label: '合约',
     //   icon: FileText,
     //   component: MerchantContract
     // },
-    {
-      id: 'config',
-      label: '设置',
-      icon: Settings,
-      component: MerchantConfig
-    }
+    // {
+    //   id: 'config',
+    //   label: '设置',
+    //   icon: Settings,
+    //   component: MerchantConfig
+    // }
   ];
 
   const ActiveComponent = menuItems.find(item => item.id === activeMenu)?.component || Dashboard;
