@@ -60,10 +60,7 @@ export function ApiConfig({ config, onConfigUpdate, onSaveWebhook, loading = fal
       {/* 密钥 */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Key className="h-5 w-5" />
-            密钥
-          </CardTitle>
+          <CardTitle>密钥</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {config.secrets && config.secrets.length > 0 ? (
