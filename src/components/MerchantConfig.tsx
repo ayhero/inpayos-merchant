@@ -277,7 +277,7 @@ export function MerchantConfig() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1>商户配置</h1>
+        <h1>设置</h1>
       </div>
 
       {/* 基本信息 - 已注释，不展示 */}
