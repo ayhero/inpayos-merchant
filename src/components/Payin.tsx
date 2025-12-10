@@ -6,7 +6,12 @@ import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Search, Filter, Download, RefreshCw, Bell, Eye } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Calendar } from './ui/calendar';
+import { Search, Filter, Download, RefreshCw, Bell, Eye, CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { zhCN } from 'date-fns/locale';
+import { cn } from './ui/utils';
 import { toast } from '../utils/toast';
 import { 
   transactionService, 
@@ -22,6 +27,8 @@ import { PaymentMethodDisplay } from './common/PaymentMethodDisplay';
 export function PayinRecords() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
   const [selectedRecord, setSelectedRecord] = useState<TransactionInfo | null>(null);
   const [records, setRecords] = useState<TransactionInfo[]>([]);
   const [loading, setLoading] = useState(false);
@@ -96,6 +103,12 @@ export function PayinRecords() {
       }
       if (searchTerm) {
         params.keyword = searchTerm;
+      }
+      if (startDate) {
+        params.startTime = new Date(startDate).getTime();
+      }
+      if (endDate) {
+        params.endTime = new Date(endDate).getTime();
       }
 
       const response = await transactionService.getTransactions(params);
@@ -252,39 +265,133 @@ export function PayinRecords() {
       {/* 筛选和搜索 */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 md:flex-initial md:w-64">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="搜索交易ID..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  className="pl-10"
-                />
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 md:flex-initial md:w-64">
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="搜索交易ID..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full md:w-32">
+                  <SelectValue placeholder="状态" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">所有状态</SelectItem>
+                  <SelectItem value="success">成功</SelectItem>
+                  <SelectItem value="pending">处理中</SelectItem>
+                  <SelectItem value="failed">失败</SelectItem>
+                  <SelectItem value="cancelled">已取消</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col md:flex-row gap-4">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[280px] justify-start text-left font-normal",
+                      !startDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {startDate ? format(new Date(startDate), "yyyy年M月d日 HH:mm:ss", { locale: zhCN }) : <span>开始时间</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <div className="flex flex-col">
+                    <Calendar
+                      mode="single"
+                      selected={startDate ? new Date(startDate) : undefined}
+                      onSelect={(date) => {
+                        if (date) {
+                          const current = startDate ? new Date(startDate) : new Date();
+                          date.setHours(current.getHours(), current.getMinutes(), current.getSeconds());
+                          setStartDate(date.toISOString());
+                        }
+                      }}
+                      initialFocus
+                    />
+                    <div className="border-t p-3 flex gap-2">
+                      <Input
+                        type="time"
+                        step="1"
+                        value={startDate ? format(new Date(startDate), "HH:mm:ss") : "00:00:00"}
+                        onChange={(e) => {
+                          const [hours, minutes, seconds] = e.target.value.split(':').map(Number);
+                          const date = startDate ? new Date(startDate) : new Date();
+                          date.setHours(hours, minutes, seconds || 0);
+                          setStartDate(date.toISOString());
+                        }}
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[280px] justify-start text-left font-normal",
+                      !endDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {endDate ? format(new Date(endDate), "yyyy年M月d日 HH:mm:ss", { locale: zhCN }) : <span>结束时间</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <div className="flex flex-col">
+                    <Calendar
+                      mode="single"
+                      selected={endDate ? new Date(endDate) : undefined}
+                      onSelect={(date) => {
+                        if (date) {
+                          const current = endDate ? new Date(endDate) : new Date();
+                          date.setHours(current.getHours(), current.getMinutes(), current.getSeconds());
+                          setEndDate(date.toISOString());
+                        }
+                      }}
+                      initialFocus
+                    />
+                    <div className="border-t p-3 flex gap-2">
+                      <Input
+                        type="time"
+                        step="1"
+                        value={endDate ? format(new Date(endDate), "HH:mm:ss") : "23:59:59"}
+                        onChange={(e) => {
+                          const [hours, minutes, seconds] = e.target.value.split(':').map(Number);
+                          const date = endDate ? new Date(endDate) : new Date();
+                          date.setHours(hours, minutes, seconds || 0);
+                          setEndDate(date.toISOString());
+                        }}
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <div className="flex gap-2">
+                <Button onClick={handleSearch} className="gap-2">
+                  <Search className="h-4 w-4" />
+                  搜索
+                </Button>
+                <Button variant="outline" className="gap-2">
+                  <Download className="h-4 w-4" />
+                  导出
+                </Button>
               </div>
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full md:w-32">
-                <SelectValue placeholder="状态" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">所有状态</SelectItem>
-                <SelectItem value="success">成功</SelectItem>
-                <SelectItem value="pending">处理中</SelectItem>
-                <SelectItem value="failed">失败</SelectItem>
-                <SelectItem value="cancelled">已取消</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button onClick={handleSearch} className="gap-2">
-              <Search className="h-4 w-4" />
-              搜索
-            </Button>
-            <Button variant="outline" className="gap-2">
-              <Download className="h-4 w-4" />
-              导出
-            </Button>
           </div>
         </CardContent>
       </Card>
