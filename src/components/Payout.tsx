@@ -97,6 +97,13 @@ export function PayoutRecords() {
         pageSize: pagination.pageSize
       };
 
+      if (startDate) {
+        params.startDate = startDate;
+      }
+      if (endDate) {
+        params.endDate = endDate;
+      }
+
       // 添加筛选条件
       if (statusFilter !== 'all') {
         params.status = statusFilter as TransactionStatus;
